@@ -21,6 +21,9 @@
   #sidebar button{all:unset;cursor:pointer;padding:9px 18px;font-size:13px;color:#a1a1aa;border-left:3px solid transparent}
   #sidebar button:hover{background:#1c1c21;color:#e4e4e7}
   #sidebar button.on{background:#1c1c21;color:#fff;border-left-color:#818cf8}
+  #sidebar button{display:flex;align-items:center;gap:8px}
+  #sidebar button .cic{margin-left:auto;font-size:10px;color:#a1a1aa;border:1px solid #3f3f46;border-radius:4px;padding:0 4px;line-height:15px;font-weight:600}
+  #sidebar button.on .cic{color:#c7d2fe;border-color:#4f46e5}
   #sidebar .sep{margin:12px 18px;border-top:1px solid #27272a}
   #sidebar .note{padding:0 18px;font-size:11px;color:#8b8b96;line-height:1.5}
   #main{flex:1;padding:var(--gap);min-width:0}
@@ -84,17 +87,17 @@
 <div id="app">
   <nav id="sidebar">
     <h1>My<span>Interviews</span></h1>
-    <button data-s="pipeline" class="on">Pipeline</button>
-    <button data-s="nueva">Nueva oferta</button>
-    <button data-s="oferta">Detalle de oferta</button>
-    <button data-s="perfil">Perfil y experiencia</button>
-    <button data-s="app">Detalle de postulación</button>
-    <button data-s="editor">Editor de documento</button>
-    <button data-s="entrevistas">Entrevistas</button>
-    <button data-s="cierre">Cierre y aprendizajes</button>
-    <button data-s="login">Login</button>
+    <button data-s="pipeline" class="on">Pipeline <span class="cic">C1</span></button>
+    <button data-s="nueva">Nueva oferta <span class="cic">C1</span></button>
+    <button data-s="oferta">Detalle de oferta <span class="cic">C1</span></button>
+    <button data-s="app">Detalle de postulación <span class="cic">C2</span></button>
+    <button data-s="perfil">Perfil y experiencia <span class="cic">C2</span></button>
+    <button data-s="editor">Editor de documento <span class="cic">C2</span></button>
+    <button data-s="entrevistas">Entrevistas <span class="cic">C3</span></button>
+    <button data-s="cierre">Cierre y aprendizajes <span class="cic">C3</span></button>
+    <button data-s="login">Login <span class="cic">C1</span></button>
     <div class="sep"></div>
-    <div class="note">Mockup congelado · Etapa 1<br>Ciclo 1 · MyInterviews<br><br>No hay datos reales: es evidencia de forma, no el producto.</div>
+    <div class="note">Mockup congelado · revisión de fase 3 (G1)<br>Ciclo 1 · MyInterviews<br><br><b style="color:#c7d2fe">C1</b> = este ciclo (MVP: cargar oferta + pipeline)<br><b style="color:#a1a1aa">C2</b> = perfil, CV con propuesta del agente y carta<br><b style="color:#a1a1aa">C3</b> = entrevistas con brief y cierre<br><br>No hay datos reales: es evidencia de forma, no el producto.</div>
   </nav>
 
   <main id="main">

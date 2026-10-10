@@ -38,10 +38,12 @@ como camino permanente y no como parche.
 | Q4 | ¿Hueco 3 — rate limit del login sin almacén? | D1 en cada intento es escritura por request; §7 no dice dónde vive. **Decisión: es decisión de Arquitecto (G2), no de alcance.** Se anota como contrato a resolver. | spec §7 |
 | Q5 | ¿Una oferta puede tener >1 postulación? | **Sí** (§3.3 lo declara: reintentos). Es N:1 y el front debe poder crear una segunda. | spec §3.3 |
 | Q6 | ¿PBKDF2 600k iteraciones cabe en un Worker? | Riesgo real de límite de CPU. **Decisión: el número es parametrizable**; se mide en el ciclo y se ajusta por binding, sin cambiar el contrato de auth. | spec §7 |
-| Q7 | ¿Se corta el spec en etapas? | **Sí.** Ver «Alcance propuesto». Ocho pantallas y siete estados en un solo ciclo es complejidad combinada sin valor visible hasta el final. | `PROCESS.md` §4 |
-| Q8 | ¿La segunda plantilla de CV entra en la Etapa 1? | **No.** Es una *variante* del mismo mecanismo; el mecanismo se prueba con una. | `LEARNINGS` corte en etapas |
-| Q9 | ¿El «prep» de entrevista por LLM entra en la Etapa 1? | **No.** Mismo motivo: es una segunda generación LLM sobre un mecanismo que ya se probó con CV/carta. | idem Q8 |
-| Q10 | ¿Hay ambigüedad en el estado `preparando`? | Menor: se dispara «al generar o editar el primer CV o carta». **Decisión: cualquier inserción de `generated_documents` con `origen ∈ {llm, manual}`.** | spec §2.1 |
+| Q7 | ¿Se corta el spec en etapas? | **Sí, y el corte lo fijó el usuario en G1** (2026-10-10): *«un ciclo 1 de MVP hasta el pipeline y cargar oferta, luego avanzamos»*. Tres ciclos. | decisión del usuario |
+| Q8 | ¿La 2ª plantilla de CV y el resto de la generación de documentos? | **Ciclo 2.** No es una decisión nueva: es consecuencia directa de que el Ciclo 1 termina en el pipeline. | Q7 |
+| Q9 | ¿El «prep» de entrevista por LLM? | **Ciclo 3.** Igual: fuera del Ciclo 1 por el corte de Q7. | Q7 |
+| Q10 | ¿Hay ambigüedad en el estado `preparando`? | Menor: se dispara «al generar o editar el primer CV o carta». **Decisión: cualquier inserción de `generated_documents` con `origen ∈ {llm, manual}`.** *(Ciclo 2: en el Ciclo 1 ninguna postulación pasa de `borrador`.)* | spec §2.1 |
+| Q11 | ¿El CV lo arma el usuario o un agente? | **El agente propone, el usuario decide** (pedido explícito del usuario). El flujo del spec (§2.3, «el usuario marca qué experiencias incluir») deja de ser el camino principal: el LLM **propone** qué experiencias incluir y **con qué prioridad**, y el usuario acepta, saca o reordena. | feedback G1 |
+| Q12 | ¿De dónde sale el brief de la entrevista? | El usuario **entrega los datos del entrevistador** (nombre, rol, y lo que tenga de la empresa) y la app devuelve un **brief**. Research manual y datos del entrevistador se suman como contexto. | feedback G1 |
 
 Q2 y Q3 **no** son escaladas: son defectos que se corrigen con un `ALTER TABLE` y no
 cambian la propuesta de valor. Se resuelven acá y se confirman en G2.
@@ -60,35 +62,47 @@ cambian la propuesta de valor. Se resuelven acá y se confirman en G2.
 5. **Los modelos siguen siendo baratos y con nombres estables.** Los slugs de OpenRouter
    se verifican al implementar; el modelo es variable de entorno, no constante de código.
    *(spec §4)*
-6. **El usuario no necesita el panel de aprendizajes global en la Etapa 1.** Ve los
-   aprendizajes dentro de cada postulación cerrada. *(propuesta de corte, Q7)*
+6. **El usuario no necesita la vista global de aprendizajes en el Ciclo 1.** Ve los
+   aprendizajes dentro de cada postulación cerrada. *(decisión de corte, Q7)*
 
 ## Alcance propuesto
 
-**Etapa 1 — el mecanismo completo, con las mínimas variantes.** Una búsqueda de trabajo
-real puede correrse de punta a punta en la app:
+**Tres ciclos. El corte lo fijó el usuario en G1** (2026-10-10): *«un ciclo 1 de MVP
+hasta el pipeline y cargar oferta, luego avanzamos»*.
 
-- Perfil + biblioteca de experiencia (CRUD de los 4 tipos) e **importación desde `.md`** con revisión y confirmación.
-- Registrar oferta por **URL o texto** con extracción LLM → JSON editable, estados `exitosa`/`parcial`/`fallida` que **nunca bloquean**.
-- Generar **CV (1 plantilla: `cv_tecnica`) y carta** anclados a las experiencias seleccionadas, con **versionado** (v1..vN, restaurar) y edición manual.
-- **Exportar PDF** a R2 (solo con sesión) y marcar **«Enviada»** (exige CV y carta vigentes).
-- Los **7 estados** de la postulación con transiciones y cierre con aprendizajes.
-- **Entrevistas 1..N** como registro: tipo, fecha, lugar/link, entrevistadores, research, resultado. *(sin «generar prep» por LLM)*
-- Pipeline con contadores por estado y próximas entrevistas.
+**Ciclo 1 (este ciclo) — el camino mínimo con valor real: cargar oferta → pipeline.**
+El usuario puede entrar, pegar una oferta (link o texto), ver los campos extraídos y
+editarlos, y verla aparecer en el pipeline agrupada por estado.
 
-**Diferido a la Etapa 2 — las variantes y los segundos usos:**
+- Login del único usuario (la app se publica: sin auth no hay URL que entregar).
+- **Cargar oferta por URL o texto** con extracción LLM → JSON editable; estados
+  `exitosa`/`parcial`/`fallida` que **nunca bloquean**.
+- Detalle de la oferta: campos editables, `campos_faltantes` resaltados, texto original.
+- Nace la **postulación en `borrador`** ligada a la oferta.
+- **Pipeline** con los contadores de los 7 estados y el tablero por estado; lista de
+  próximas entrevistas (vacía en este ciclo, pero el bloque existe y está medido).
 
-- 2ª plantilla de CV (`cv_ejecutiva`) y contenido final de las 2 plantillas.
-- «Generar prep» de entrevista por LLM con streaming SSE.
-- Vista global de aprendizajes filtrable (para detectar patrones entre procesos).
-- Streaming SSE en la generación de documentos (en Etapa 1: respuesta completa).
-- Rotación de credenciales por UI.
+**Ciclo 2 — perfil, CV y carta.** Importación desde `.md`, biblioteca de experiencia,
+y la generación de documentos con el cambio que pidió el usuario (**Q11**): el **agente
+propone** qué experiencias incluir y con qué prioridad, y el usuario acepta, saca o
+reordena. Incluye versionado, edición manual, PDF, «Enviada» (que exige CV **y** carta
+vigentes) y el paso a `preparando`.
 
-Por qué se puede diferir sin romper la Etapa 1: cada diferido es **una variante de un
-mecanismo que la Etapa 1 ya entrega completo** (una plantilla prueba el motor de
-plantillas; CV/carta prueban el motor LLM; los aprendizajes por postulación prueban el
-registro; la vista global solo lo agrega). Ajustar plantilla sigue siendo editar un
-archivo del repo: **no hay deuda de código** por no implementar la segunda.
+**Ciclo 3 — entrevistas y cierre.** Entrevistas 1..N con research, y el **brief** que
+pidió el usuario (**Q12**): se entregan los datos del entrevistador y la app devuelve un
+brief anclado a la oferta y al CV vigente. Más el cierre con aprendizajes y la vista
+global filtrable.
+
+Por qué el Ciclo 1 es una unidad honesta y no un recorte arbitrario: entrega el motor
+más riesgoso del producto —**la extracción LLM con validación y el estado que la
+acompaña**— funcionando sobre una URL pública, que es exactamente lo que permite juzgar
+si el resto vale la pena. El coste de inacción del análisis dice que el producto pierde
+si la extracción obliga a corregir más de lo que ahorra: eso se prueba acá, antes de
+invertir en 8 pantallas.
+
+Lo que **se cobra** por cortar así: el pipeline del Ciclo 1 muestra una máquina de
+estados que todavía nadie recorre más allá de `borrador`. Se acepta a cambio de ver la
+extracción real antes.
 
 ## Anti-alcance (lo que NO entra)
 
