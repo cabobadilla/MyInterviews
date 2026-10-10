@@ -31,6 +31,8 @@ están definidos en `03-DEFINICION.md` (los ciclos 2 y 3) y esperan a sus ciclos
 | `worker/llm/*` | habla con OpenRouter, reduce HTML, valida con Zod | no conoce D1 ni HTTP |
 | `worker/lib/*` | sesión (HMAC), rate limit, esquemas Zod | sin efectos |
 | `app/*` (SPA) | UI | **nunca** llama a OpenRouter: todo pasa por la API |
+| `tests/fixtures/*.html` | una por pantalla: monta los componentes reales con datos fijos → verifican `existencia` y `forma` (ADR-005) | **importa** los componentes, no los reimplementa |
+| `tests/helpers/browser.mjs` | infraestructura **sellada** del harness | el Coder **no** lo edita |
 
 ### Flujo de datos — cargar una oferta
 
@@ -234,24 +236,24 @@ assets. El valor de `APP_PASSWORD_HASH` se genera **fuera** del entorno del Code
 
 | ID | Caso | Criterio de origen | Clase | Observable esperado |
 |---|---|---|---|---|
-| `C-01` | Sin sesión se ve el login | C-01 | existencia | `#login` existe en el DOM tras `GET /` |
+| **C-01** | Sin sesión se ve el login | C-01 | existencia | `pagina.caja('#login') !== null` en el fixture `login.html` |
 | `C-02` | `/api/*` sin cookie | C-02 | comportamiento | `GET /api/offers` sin cookie → `401`; **0** consultas D1 |
 | `C-03` | Login falla, error genérico | C-03 | comportamiento | email inexistente y contraseña mala → **mismo status y mismo cuerpo** |
 | `C-04` | 6º intento bloqueado | C-04 | comportamiento | 5 fallos → 6º responde `429` **sin verificar la contraseña** |
 | `C-05` | Cookie de sesión y logout | C-05 | comportamiento | `Set-Cookie` con `HttpOnly`, `Secure`, `SameSite=Strict`; tras logout la cookie vieja → `401` |
 | `C-06` | Cookie manipulada o vencida | C-06 | comportamiento | firma alterada → `401` + cookie de borrado |
-| `C-07` | Pantalla de nueva oferta | C-07 | existencia | `#nueva-oferta` existe autenticado |
+| **C-07** | Pantalla de nueva oferta | C-07 | existencia | `#nueva-oferta` existe en el fixture `nueva-oferta.html` |
 | `C-08` | Texto → oferta + postulación | C-08 | comportamiento | `POST /api/offers/extract` → oferta con `titulo`/`empresa` **y** `applications.status='borrador'` |
 | `C-09` | URL → descarga y reduce | C-09 | comportamiento | con fetch inyectado que devuelve HTML, la oferta sale con los campos del texto |
 | `C-10` | Extracción sin salario → parcial | C-10 | comportamiento | `extraction_status='parcial'` y `campos_faltantes_json` ⊇ {salario, beneficios} |
 | `C-11` | JSON inválido tras 1 reintento | C-11 | comportamiento | LLM falso devuelve basura 2 veces → `fallida`, con `raw_text` y `extraction_error`, **y la oferta se crea igual** |
 | `C-12` | URL no descargable | C-12 | comportamiento | fetch que falla → error explícito que ofrece pegar texto y **0** filas nuevas |
 | `C-13` | Texto de 40.000 caracteres | C-13 | comportamiento | al LLM le llegan **≤15.000** y la fila registra el truncado |
-| `C-14` | Detalle de la oferta | C-14 | existencia | la pantalla muestra los campos de esa oferta |
+| **C-14** | Detalle de la oferta | C-14 | existencia | el fixture `detalle-oferta.html` muestra los campos de la oferta |
 | `C-15` | Editar una oferta `fallida` | C-15 | comportamiento | `PUT /api/offers/:id` → `200` y el valor persiste |
 | `C-16` | Campos faltantes resaltados | C-16 | comportamiento | los inputs de `campos_faltantes_json` llevan la clase de resalte |
 | `C-17` | Texto original consultable | C-17 | comportamiento | el detalle expone `raw_text` y `source_url` tal como se guardaron |
-| `C-18` | Pantalla de pipeline | C-18 | existencia | `#pipeline` existe autenticado |
+| **C-18** | Pantalla de pipeline | C-18 | existencia | `#pipeline` existe en el fixture `pipeline.html` |
 | `C-19` | 7 contadores por estado | C-19 | comportamiento | 7 contadores presentes, cada uno con su número, incluidos los ceros |
 | `C-20` | Alta en vivo | C-20 | comportamiento | tras crear la oferta, la fila nueva está en el pipeline **sin reload** |
 | `C-21` | Próximas entrevistas ordenadas | C-21 | comportamiento | 3 entrevistas futuras desordenadas → lista ascendente; sin entrevistas → lista vacía |
@@ -273,9 +275,11 @@ final del Coder, con `./scripts/hidden-cases.sh run <proyecto> 1`.
 
 ### Clase de criterio
 
-Cada fila declara la clase de su criterio de origen. Las de clase `forma` (`C-22`,
-`C-23`, `C-24`) **miden geometría** con `getBoundingClientRect()` sobre el fixture
-(**ADR-005**), no la describen.
+Cada fila declara la clase de su criterio de origen. Las de clase `existencia`
+(`C-01`, `C-07`, `C-14`, `C-18`) y las de clase `forma` (`C-22`, `C-23`, `C-24`) se
+verifican **sobre los fixtures** que montan los componentes reales (**ADR-005**): la
+`existencia` consultando el DOM renderizado y la `forma` midiendo geometría con
+`getBoundingClientRect()`. Ninguna se verifica leyendo el HTML del artefacto.
 
 ## 7. Trazabilidad
 

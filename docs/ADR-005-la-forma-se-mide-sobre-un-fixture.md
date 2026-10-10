@@ -1,4 +1,4 @@
-# ADR-005 — La forma se mide sobre un fixture que monta los componentes reales
+# ADR-005 — La forma y la existencia se miden sobre fixtures que montan los componentes reales
 
 - **Fecha:** 2026-10-10
 - **Estado:** aceptado
@@ -10,7 +10,21 @@ C-22, C-23 y C-24 son de clase `forma` y hay que medirlas con `getBoundingClient
 
 ## Decisión
 
-Los casos de forma se miden con `browser.mjs` sobre **`tests/fixtures/pipeline.html`**, un fixture que **monta los componentes reales de la SPA con datos fijos**.
+Los casos de **`forma`** y **`existencia`** se miden con `browser.mjs` sobre
+**fixtures por pantalla** en `tests/fixtures/` (`login.html`, `pipeline.html`,
+`nueva-oferta.html`, `detalle-oferta.html`), que **montan los componentes reales de la
+SPA con datos fijos**.
+
+**Por qué también `existencia` y no solo `forma`:** una SPA renderiza en el cliente. El
+DOM no existe hasta que corre el JS, así que «el elemento está» **no se puede verificar
+leyendo el HTML del Worker ni el `index.html` construido** — hay que renderizarlo. Y
+`browser.mjs` sirve un archivo, no una URL, así que tampoco puede apuntar al dev server.
+Sin fixtures, un criterio de `existencia` sobre una SPA no tiene forma de verificarse, y
+el Coder lo terminaría resolviendo con un `includes()` sobre el HTML — justo lo que el
+harness prohíbe por tautológico.
+
+Los fixtures son **entradas extra de Vite** (cada uno un HTML con su script): se
+construyen con el resto de la SPA, así que montan el mismo código y el mismo CSS.
 
 ## Alternativas descartadas
 
@@ -28,7 +42,7 @@ Los casos de forma se miden con `browser.mjs` sobre **`tests/fixtures/pipeline.h
 - El mismo helper sellado, sin editarlo.
 
 **Negativas / costo asumido:**
-- El fixture es un archivo más que mantener: si los componentes cambian de forma, el fixture tiene que montarlos igual. Se mitiga montando las **mismas** piezas, no una copia del HTML.
+- Hay **un fixture por pantalla** que mantener: si un componente cambia, su fixture tiene que montarlo igual. Se mitiga haciendo que el fixture **importe** el componente, en vez de copiar su HTML.
 - No mide el layout con datos reales ni con sesión iniciada: eso lo cubre el smoke.
 
 **Qué se vuelve difícil después de esto:**
