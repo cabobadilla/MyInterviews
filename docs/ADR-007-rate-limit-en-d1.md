@@ -10,7 +10,28 @@ C-04 exige bloquear el 6º intento en 15 minutos por IP. El spec §7 lo pide per
 
 ## Decisión
 
-Una tabla `login_attempts` en **D1**, con la IP y el instante del intento; la ventana se consulta por rango de tiempo.
+Una tabla `login_attempts` en **D1**, con la IP del intento, si acertó y cuándo; la ventana se
+consulta por rango de tiempo.
+
+**El spec §3.3 no trae esta tabla.** El límite de intentos lo pide §2.1 y el esquema
+confirmado no tenía dónde contarlo, así que la tabla **es parte de esta decisión**: sin
+declararla acá, el Coder la inventa — y una tabla inventada por el Coder no ha sido
+diseñada por nadie. Esquema mínimo y suficiente:
+
+```sql
+CREATE TABLE login_attempts (
+  ip         TEXT NOT NULL,          -- la clave del límite es la IP, no la credencial
+  exito      INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_login_attempts_ip_fecha ON login_attempts (ip, created_at);
+```
+
+Ventana de 15 minutos, umbral 5 intentos **fallidos**. Los exitosos no cuentan para el
+bloqueo pero se registran: un login que funciona es la evidencia de que el camino está sano.
+
+Nada de esta tabla sobrevive al ciclo: es un contador con fecha de vencimiento, y si crece
+se poda por antigüedad.
 
 ## Alternativas descartadas
 

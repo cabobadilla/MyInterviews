@@ -12,6 +12,15 @@ El spec §3.1 fija Front en Cloudflare Pages y API en un Worker, con D1. El harn
 
 **Un único Worker con `main` (Hono) + `assets`** que sirve la API y la SPA compilada desde el mismo origen.
 
+El binding se declara **en forma de objeto**, que es lo que acepta el CLI:
+
+```jsonc
+"assets": { "directory": "./public" }
+```
+
+Wrangler 4 **rechaza** la forma de string (`"assets": "./public"`). No es estilo: es lo
+único que el CLI no tira abajo.
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué se descartó |
