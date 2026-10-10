@@ -1,0 +1,62 @@
+{
+  "proyecto": "MyInterviews",
+  "perfil": "producto",
+  "resumen": "Ciclo 1 · Etapa 1. Fases 1–3 escritas y el mockup publicado. Esperando el gate humano G1 (aprobación de criterios y corte en etapas).",
+  "ciclo": "Ciclo 1",
+  "etapa": "Etapa 1",
+  "fase_actual": "Definición",
+  "siguiente": "G1 — el usuario aprueba docs/03-DEFINICION.md (C-01..C-50) y el corte en etapas. Revisar el mockup en https://myinterviews-mockup.mkvs.workers.dev",
+  "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
+  "gates": {
+    "G0":  { "evaluado": 1, "rechazo": 0 },
+    "G1a": { "evaluado": 1, "rechazo": 0 },
+    "G1":  { "evaluado": 0, "rechazo": 0 },
+    "G2":  { "evaluado": 0, "rechazo": 0 },
+    "G3":  { "evaluado": 0, "rechazo": 0 },
+    "G4":  { "evaluado": 0, "rechazo": 0 },
+    "G5":  { "evaluado": 0, "rechazo": 0 }
+  },
+  "casos_ocultos": 0,
+  "modelo": { "coder": "opencode-go/glm-5.3-flash", "nota": "se valida con el canario de capacidad (preflight-model.sh) antes de despachar" },
+  "mockup": {
+    "url": "https://myinterviews-mockup.mkvs.workers.dev",
+    "estado": "publicado y congelado — 14/14 mediciones de forma OK sobre el DOM renderizado",
+    "mediciones": "M-1 columnas 178,1 top / 82,4 ancho · M-2 sidebar 240,0 y contenido a 24,0 · M-3 pane top 183,2 alto 779,4 gap 16,0 · M-4 fecha left 264,5"
+  },
+  "despliegue": {
+    "plataforma": "Cloudflare",
+    "forma_worker": "por definir en 04-DISENO.md (G2): API con `main` (Hono) + front como assets",
+    "local": "wrangler dev — sin cuenta ni credenciales",
+    "cloud": "pendiente (G2 nombra el límite del plan que podría romper el diseño)"
+  },
+  "fases": [
+    { "id": "idea",     "nombre": "1 · Idea",                     "estado": "completa",  "gate": "G0",  "resumen": "Spec v3 verbatim + las 3 preguntas con supuesto del PO", "puntos": ["01-IDEA.md"] },
+    { "id": "analisis", "nombre": "2 · Análisis",                 "estado": "completa",  "gate": "G1a", "resumen": "10 dudas resueltas, 3 huecos de esquema encontrados, corte en etapas", "puntos": ["02-ANALISIS.md"] },
+    { "id": "def",      "nombre": "3 · Definición",               "estado": "en curso",  "gate": "G1",  "resumen": "C-01..C-50 en EARS con clase; 4 mediciones de forma medidas; mockup publicado", "puntos": ["03-DEFINICION.md", "mockup"] },
+    { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "pendiente", "gate": "G2",  "resumen": "", "puntos": [] },
+    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "pendiente", "gate": "G5",  "resumen": "", "puntos": [] }
+  ],
+  "historias": [
+    { "id": "HU-1", "titulo": "Importar experiencia desde .md",        "criterios": 4 },
+    { "id": "HU-2", "titulo": "Perfil y biblioteca de experiencia",    "criterios": 4 },
+    { "id": "HU-3", "titulo": "Registrar oferta y extraer campos",     "criterios": 7 },
+    { "id": "HU-4", "titulo": "CV y carta con versionado",             "criterios": 8 },
+    { "id": "HU-5", "titulo": "Exportar PDF y marcar Enviada",         "criterios": 6 },
+    { "id": "HU-6", "titulo": "Pipeline y próximas entrevistas",       "criterios": 4 },
+    { "id": "HU-7", "titulo": "Planificar y registrar N entrevistas",  "criterios": 5 },
+    { "id": "HU-8", "titulo": "Cerrar con aprendizajes",               "criterios": 6 },
+    { "id": "HU-9", "titulo": "Acceso de un solo usuario",             "criterios": 6 }
+  ],
+  "decisiones": [
+    { "id": "Q2", "texto": "Se agrega `status_previo` a applications: el spec pide «reabrir al estado previo» y el esquema no tenía dónde guardarlo." },
+    { "id": "Q3", "texto": "`idx_docs_actual` pasa a índice parcial ÚNICO: con el índice no único podían coexistir dos versiones «vigentes»." },
+    { "id": "Q7", "texto": "Corte en etapas: la Etapa 1 entrega el mecanismo completo (una búsqueda de punta a punta) con una sola plantilla de CV y sin prep por LLM." }
+  ],
+  "diferido": [
+    "2ª plantilla de CV (cv_ejecutiva) y contenido final de las dos plantillas — el usuario lo definirá después (spec §10)",
+    "«Generar prep» de entrevista por LLM",
+    "Streaming SSE en generación de documentos",
+    "Vista global de aprendizajes filtrable",
+    "Rotación de credenciales por UI"
+  ]
+}

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyInterviews — Mockup Etapa 1 (congelado)</title>
+<style>
+  :root{
+    --bg:#f7f7f8; --panel:#fff; --line:#e4e4e7; --ink:#18181b; --dim:#71717a;
+    --accent:#4f46e5; --accent-soft:#eef2ff; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#15803d; --ok-soft:#dcfce7; --bad:#b91c1c; --bad-soft:#fee2e2;
+    --sidebar:240px; --gap:24px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  #app{display:flex;min-height:100vh}
+  /* ---------- navegación lateral : M-2 ---------- */
+  #sidebar{width:var(--sidebar);min-width:var(--sidebar);background:#111114;color:#e4e4e7;padding:18px 0;display:flex;flex-direction:column;gap:2px}
+  #sidebar h1{font-size:15px;margin:0 18px 14px;letter-spacing:.02em}
+  #sidebar h1 span{color:#818cf8}
+  #sidebar button{all:unset;cursor:pointer;padding:9px 18px;font-size:13px;color:#a1a1aa;border-left:3px solid transparent}
+  #sidebar button:hover{background:#1c1c21;color:#e4e4e7}
+  #sidebar button.on{background:#1c1c21;color:#fff;border-left-color:#818cf8}
+  #sidebar .sep{margin:12px 18px;border-top:1px solid #27272a}
+  #sidebar .note{padding:0 18px;font-size:11px;color:#52525b;line-height:1.5}
+  #main{flex:1;padding:var(--gap);min-width:0}
+  /* ---------- genéricos ---------- */
+  .screen{display:none}
+  .screen.on{display:block}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .top h2{margin:0;font-size:19px}
+  .top p{margin:2px 0 0;color:var(--dim);font-size:13px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .btn{all:unset;cursor:pointer;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:12px;align-items:center}
+  label{display:block;font-size:12px;color:var(--dim);margin:0 0 4px}
+  input,textarea,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+  textarea{min-height:130px;resize:vertical}
+  .f{border-color:var(--warn);background:var(--warn-soft)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .pill.bad{background:var(--bad-soft);color:var(--bad)}
+  .pill.info{background:var(--accent-soft);color:var(--accent)}
+  .muted{color:var(--dim);font-size:12px}
+  /* ---------- pipeline : M-1 ---------- */
+  #contadores{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  #contadores .c{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;display:flex;gap:6px;align-items:center}
+  #contadores .c b{font-size:13px}
+  #board{display:flex;gap:14px;align-items:flex-start}
+  #board .col{flex:1 1 0;min-width:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+  #board .col h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);display:flex;justify-content:space-between}
+  .job{border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;background:#fcfcfd}
+  .job b{display:block;font-size:13px}
+  .job .m{color:var(--dim);font-size:11px;margin-top:2px}
+  #agenda{margin-top:22px}
+  #agenda table{border-collapse:collapse;width:100%;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  #agenda td,#agenda th{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}
+  #agenda th{color:var(--dim);font-weight:600;background:#fafafa}
+  #agenda td.d{width:170px}   /* M-4: la fecha siempre en la misma columna */
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:16px 0 18px}
+  .tabs button{all:unset;cursor:pointer;padding:9px 14px;font-size:13px;color:var(--dim);border-bottom:2px solid transparent}
+  .tabs button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+  /* ---------- editor : M-3 ---------- */
+  #editor{display:flex;gap:16px;align-items:stretch;min-height:420px}
+  #editor .pane{flex:1 1 0;min-width:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column}
+  #editor .pane header{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim);display:flex;justify-content:space-between}
+  #editor .body{padding:14px;flex:1;overflow:auto;font-size:13px;white-space:pre-wrap}
+  #editor .body.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#3f3f46}
+  .chk{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f4f4f5;font-size:13px}
+  /* ---------- mediciones ---------- */
+  #med{position:fixed;right:16px;bottom:16px;z-index:50;font-size:12px}
+  #medout{display:none;position:fixed;right:16px;bottom:64px;width:430px;max-height:60vh;overflow:auto;background:#111114;color:#d4d4d8;border-radius:10px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;z-index:50}
+  #medout h4{color:#fff;margin:0 0 8px;font-family:inherit;font-size:12px}
+  #medout .y{color:#4ade80}
+  #medout .n{color:#f87171}
+  .loginwrap{max-width:360px;margin:9vh auto}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="sidebar">
+    <h1>My<span>Interviews</span></h1>
+    <button data-s="pipeline" class="on">Pipeline</button>
+    <button data-s="nueva">Nueva oferta</button>
+    <button data-s="oferta">Detalle de oferta</button>
+    <button data-s="perfil">Perfil y experiencia</button>
+    <button data-s="app">Detalle de postulación</button>
+    <button data-s="editor">Editor de documento</button>
+    <button data-s="entrevistas">Entrevistas</button>
+    <button data-s="cierre">Cierre y aprendizajes</button>
+    <button data-s="login">Login</button>
+    <div class="sep"></div>
+    <div class="note">Mockup congelado · Etapa 1<br>Ciclo 1 · MyInterviews<br><br>No hay datos reales: es evidencia de forma, no el producto.</div>
+  </nav>
+
+  <main id="main">
+
+    <!-- ============ 2 · PIPELINE ============ -->
+    <section class="screen on" id="s-pipeline">
+      <div class="top">
+        <div><h2>Pipeline</h2><p>4 procesos abiertos · 1 cerrado</p></div>
+        <button class="btn">+ Nueva oferta</button>
+      </div>
+      <div id="contadores">
+        <span class="c">Borrador <b>2</b></span><span class="c">Preparando <b>1</b></span>
+        <span class="c">Enviada <b>1</b></span><span class="c">Entrevistas <b>1</b></span>
+        <span class="c">Oferta <b>0</b></span><span class="c">Rechazada <b>1</b></span>
+        <span class="c">Cerrada <b>1</b></span>
+      </div>
+      <div id="board">
+        <div class="col"><h3>Borrador <span>2</span></h3>
+          <div class="job"><b>Data Engineer</b><div class="m">Globant · remoto · hace 2 h</div></div>
+          <div class="job"><b>Backend Engineer</b><div class="m">MODO · híbrido · hace 1 día</div></div>
+        </div>
+        <div class="col"><h3>Preparando <span>1</span></h3>
+          <div class="job"><b>Platform Engineer</b><div class="m">Mercado Libre · 1 CV · sin carta</div></div>
+        </div>
+        <div class="col"><h3>Enviada <span>1</span></h3>
+          <div class="job"><b>Staff Engineer</b><div class="m">Ualá · enviada 05-oct</div></div>
+        </div>
+        <div class="col"><h3>Entrevistas <span>1</span></h3>
+          <div class="job"><b>SRE Engineer</b><div class="m">Auth0 · ent. 2 de 3 · 12-oct 15:00</div></div>
+        </div>
+        <div class="col"><h3>Cerradas <span>2</span></h3>
+          <div class="job"><b>Cloud Architect</b><div class="m">AWS · rechazada · con aprendizajes</div></div>
+          <div class="job"><b>Tech Lead</b><div class="m">Naranja X · cerrada · aceptada</div></div>
+        </div>
+      </div>
+      <div id="agenda">
+        <h3 style="font-size:13px;margin:0 0 8px">Próximas entrevistas</h3>
+        <table>
+          <tr><th>Cuándo</th><th>Puesto</th><th>Empresa</th><th>Tipo</th></tr>
+          <tr><td class="d">12-oct 15:00</td><td>SRE Engineer</td><td>Auth0</td><td>técnica (2/3)</td></tr>
+          <tr><td class="d">14-oct 10:30</td><td>SRE Engineer</td><td>Auth0</td><td>cultural (3/3)</td></tr>
+          <tr><td class="d">16-oct 09:00</td><td>Staff Engineer</td><td>Ualá</td><td>screening</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 3 · NUEVA OFERTA ============ -->
+    <section class="screen" id="s-nueva">
+      <div class="top"><div><h2>Nueva oferta</h2><p>Pegá la URL o el texto de la publicación</p></div>
+        <button class="btn" onclick="document.querySelector('#extraccion').style.display='block'">Extraer campos</button></div>
+      <div class="card" style="max-width:760px">
+        <label>URL o texto</label>
+        <textarea>https://boards.greenhouse.io/empresa/jobs/4471902 — SRE Engineer, remoto LATAM. Buscamos un/a SRE con experiencia en Kubernetes, Terraform y observabilidad. Requisitos: 5+ años en infraestructura, Kubernetes en producción, IaC (Terraform), AWS, Linux. Deseables: Prometheus/Grafana, Go. Ofrecemos...</textarea>
+      </div>
+      <div class="card" id="extraccion" style="max-width:760px;margin-top:14px;display:none">
+        <div class="row" style="justify-content:space-between"><b>Extracción</b><span class="pill warn">parcial</span></div>
+        <p class="muted" style="margin:8px 0 12px">Faltan: <b>salario</b>, <b>beneficios</b>, <b>seniority</b>. Se resaltan abajo para completar a mano. La extracción nunca bloquea el flujo.</p>
+        <div class="row" style="gap:14px">
+          <div style="flex:1"><label>Título</label><input value="SRE Engineer"></div>
+          <div style="flex:1"><label>Empresa</label><input value="Auth0"></div>
+        </div>
+        <div class="row" style="gap:14px;margin-top:10px">
+          <div style="flex:1"><label>Modalidad</label><input value="remoto"></div>
+          <div style="flex:1"><label>Seniority</label><input class="f" placeholder="—"></div>
+          <div style="flex:1"><label>Salario (texto)</label><input class="f" placeholder="—"></div>
+        </div>
+        <div style="margin-top:14px"><label>Beneficios</label><input class="f" placeholder="—"></div>
+        <div style="margin-top:14px"><label>Requisitos obligatorios</label><input value="Kubernetes · Terraform · AWS · Linux · 5+ años"></div>
+        <div style="margin-top:16px" class="row"><button class="btn">Guardar y crear postulación</button><span class="muted">→ crea la postulación en <b>borrador</b></span></div>
+      </div>
+    </section>
+
+    <!-- ============ 4 · DETALLE DE OFERTA ============ -->
+    <section class="screen" id="s-oferta">
+      <div class="top"><div><h2>SRE Engineer — Auth0</h2><p>Extracción parcial · editable a mano</p></div><span class="pill warn">parcial</span></div>
+      <div class="card" style="max-width:860px">
+        <div class="row" style="gap:14px">
+          <div style="flex:1"><label>Título</label><input value="SRE Engineer"></div>
+          <div style="flex:1"><label>Empresa</label><input value="Auth0"></div>
+          <div style="flex:1"><label>Ubicación</label><input value="LATAM"></div>
+        </div>
+        <div class="row" style="gap:14px;margin-top:10px">
+          <div style="flex:1"><label>Modalidad</label><input value="remoto"></div>
+          <div style="flex:1"><label>Seniority</label><input class="f" placeholder="—"></div>
+          <div style="flex:1"><label>Salario</label><input class="f" placeholder="—"></div>
+        </div>
+        <div style="margin-top:14px"><label>Resumen</label><textarea style="min-height:70px">Buscamos un/a SRE para el equipo de plataforma, con foco en Kubernetes, IaC y observabilidad.</textarea></div>
+        <div style="margin-top:14px"><label>Skills</label><input value="Kubernetes (obligatoria) · Terraform (obligatoria) · Prometheus (deseable) · Go (deseable)"></div>
+      </div>
+      <details style="max-width:860px;margin-top:14px" class="card"><summary class="muted" style="cursor:pointer">Texto original (plegado) · link fuente</summary>
+        <p class="muted" style="white-space:pre-wrap">https://boards.greenhouse.io/empresa/jobs/4471902 — SRE Engineer, remoto LATAM…</p></details>
+    </section>
+
+    <!-- ============ 5 · PERFIL ============ -->
+    <section class="screen" id="s-perfil">
+      <div class="top"><div><h2>Perfil y experiencia</h2><p>4 experiencias · biblioteca reutilizable</p></div>
+        <button class="btn ghost">Importar desde .md</button></div>
+      <div class="card" style="max-width:900px">
+        <div class="row" style="gap:14px">
+          <div style="flex:1"><label>Nombre</label><input value="Christian Bobadilla"></div>
+          <div style="flex:1"><label>Email</label><input value="(contacto)"></div>
+          <div style="flex:1"><label>LinkedIn</label><input value="linkedin.com/in/…"></div>
+        </div>
+        <div style="margin-top:14px"><label>Resumen</label><textarea style="min-height:70px">Arquitecto de software con 15 años diseñando plataformas cloud…</textarea></div>
+      </div>
+      <div class="card" style="max-width:900px;margin-top:14px">
+        <div class="row" style="justify-content:space-between"><b>Experiencia</b><span class="muted">reordenable por arrastre</span></div>
+        <div class="job" style="margin-top:10px"><b>Arquitecto de Soluciones · Banco X</b><div class="m">2021-03 → presente · laboral · 3 logros · 6 skills</div></div>
+        <div class="job"><b>Tech Lead · Consultora Y</b><div class="m">2017-01 → 2021-02 · laboral · 4 logros</div></div>
+        <div class="job"><b>Plataforma de observabilidad · proyecto propio</b><div class="m">2023 · proyecto · 2 logros</div></div>
+        <div class="job"><b>Posgrado en Arquitectura de Software</b><div class="m">2019 · educacion · certificacion</div></div>
+        <div class="row" style="margin-top:6px"><button class="btn ghost">+ Agregar experiencia</button></div>
+      </div>
+      <div class="card" style="max-width:900px;margin-top:14px;border-color:#c7d2fe;background:var(--accent-soft)">
+        <b>Importar desde .md</b>
+        <p class="muted" style="margin:8px 0">Vista previa editable de lo detectado. <b>Nada se guarda hasta que confirmes</b>, y la importación solo agrega: no toca lo que ya está cargado.</p>
+        <div class="row"><span class="pill ok">perfil</span><span class="pill info">4 experiencias</span><button class="btn">Confirmar y agregar</button></div>
+      </div>
+    </section>
+
+    <!-- ============ 6 · DETALLE DE POSTULACIÓN ============ -->
+    <section class="screen" id="s-app">
+      <div class="top">
+        <div><h2>SRE Engineer — Auth0</h2><p>Postulación #4 · creada 04-oct</p></div>
+        <div class="row"><span class="pill info">entrevistas</span><button class="btn ghost">Cerrar proceso</button></div>
+      </div>
+      <div class="tabs">
+        <button>Oferta</button><button>CV <span class="pill ok">v2 vigente</span></button>
+        <button>Carta <span class="pill ok">v1 vigente</span></button>
+        <button class="on">Entrevistas <span class="pill info">3</span></button>
+        <button>Aprendizajes</button>
+      </div>
+      <div class="card" style="max-width:900px">
+        <div class="job"><b>1 · Screening · aprobada</b><div class="m">02-oct 11:00 · 30 min · Google Meet · reclutadora</div></div>
+        <div class="job"><b>2 · Técnica · pendiente</b><div class="m">12-oct 15:00 · 60 min · link · líder de plataforma + SRE</div></div>
+        <div class="job"><b>3 · Cultural · pendiente</b><div class="m">14-oct 10:30 · 45 min · link · hiring manager</div></div>
+      </div>
+    </section>
+
+    <!-- ============ 7 · EDITOR DE DOCUMENTO  (M-3) ============ -->
+    <section class="screen" id="s-editor">
+      <div class="top">
+        <div><h2>CV de SRE Engineer — Auth0</h2><p>Técnica · v2 vigente · v1 consultable</p></div>
+        <div class="row"><select style="width:170px"><option>cv_tecnica</option><option>cv_ejecutiva (etapa 2)</option></select>
+          <button class="btn ghost">Generar</button><button class="btn">Exportar PDF</button></div>
+      </div>
+      <div class="row" style="align-items:flex-start;gap:16px">
+        <div class="card" style="width:260px;min-width:260px">
+          <b style="font-size:12px">Experiencias incluidas</b>
+          <div class="chk"><input type="checkbox" checked> Arquitecto de Soluciones · Banco X</div>
+          <div class="chk"><input type="checkbox" checked> Tech Lead · Consultora Y</div>
+          <div class="chk"><input type="checkbox" checked> Plataforma de observabilidad</div>
+          <div class="chk"><input type="checkbox"> Posgrado en Arquitectura</div>
+          <p class="muted" style="margin:10px 0 0">El modelo no inventa experiencia: solo usa las marcadas.</p>
+        </div>
+        <div id="editor" style="flex:1">
+          <div class="pane"><header><span>Editor (Markdown)</span><span>v2 · manual</span></header>
+            <div class="body mono"># Christian Bobadilla
+SRE / Platform Engineer · remoto LATAM
+
+## Resumen
+Arquitecto con 15 años en plataformas cloud.
+Foco en Kubernetes, IaC y observabilidad.
+
+## Experiencia
+### Arquitecto de Soluciones · Banco X (2021 → hoy)
+- Redujo 40% el coste de cómputo migrando…
+- Diseñó la plataforma de observabilidad…
+
+### Tech Lead · Consultora Y (2017 → 2021)
+- Lideró un equipo de 6…
+
+## Skills
+Kubernetes · Terraform · AWS · Linux · Go</div>
+          </div>
+          <div class="pane"><header><span>Vista previa</span><span>v1 · v2</span></header>
+            <div class="body"><b style="font-size:16px">Christian Bobadilla</b>
+SRE / Platform Engineer · remoto LATAM
+
+<b>Resumen</b>
+Arquitecto con 15 años en plataformas cloud. Foco en Kubernetes, IaC y observabilidad.
+
+<b>Experiencia</b>
+Arquitecto de Soluciones · Banco X (2021 → hoy)
+· Redujo 40% el coste de cómputo migrando…
+· Diseñó la plataforma de observabilidad…
+
+<b>Skills</b>
+Kubernetes · Terraform · AWS · Linux · Go</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 8 · ENTREVISTAS ============ -->
+    <section class="screen" id="s-entrevistas">
+      <div class="top"><div><h2>Entrevistas · SRE Engineer (Auth0)</h2><p>3 de 3 planificadas · 1 aprobada</p></div>
+        <button class="btn">+ Nueva entrevista</button></div>
+      <div class="row" style="align-items:flex-start;gap:16px">
+        <div class="card" style="width:300px;min-width:300px">
+          <div class="job"><b>1 · Screening</b><div class="m">02-oct · 30 min · <span class="pill ok">aprobada</span></div></div>
+          <div class="job"><b>2 · Técnica</b><div class="m">12-oct · 60 min · <span class="pill warn">pendiente</span></div></div>
+          <div class="job"><b>3 · Cultural</b><div class="m">14-oct · 45 min · <span class="pill warn">pendiente</span></div></div>
+        </div>
+        <div class="card" style="flex:1">
+          <div class="row" style="justify-content:space-between"><b>2 · Técnica</b><span class="muted">12-oct 15:00 · Google Meet</span></div>
+          <div style="margin-top:12px"><label>Research (empresa y entrevistadores)</label>
+            <textarea style="min-height:80px">Auth0: identidad como servicio. El equipo de plataforma migró a multi-región…</textarea></div>
+          <div style="margin-top:12px"><label>Resultado</label>
+            <div class="row"><select style="width:190px"><option>pendiente</option><option>aprobada</option><option>rechazada</option><option>sin_respuesta</option></select></div></div>
+          <div style="margin-top:14px" class="row"><button class="btn ghost">Generar prep (etapa 2)</button><span class="muted">checklist</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 9 · CIERRE Y APRENDIZAJES ============ -->
+    <section class="screen" id="s-cierre">
+      <div class="top"><div><h2>Cerrar proceso — Cloud Architect (AWS)</h2><p>El cierre exige ≥1 aprendizaje, o la casilla explícita</p></div><span class="pill bad">rechazada</span></div>
+      <div class="card" style="max-width:860px">
+        <label>Resultado final</label>
+        <div class="row"><select style="width:220px"><option>rechazada</option><option>aceptada</option><option>retirada</option><option>sin_respuesta</option></select></div>
+        <div style="margin-top:14px"><label>Qué funcionó</label><textarea style="min-height:70px">La prep de la entrevista técnica: el mapa de requisitos → logros funcionó.</textarea></div>
+        <div style="margin-top:14px"><label>Qué mejorar</label><textarea style="min-height:70px">Me quedé corto en profundidad sobre multi-región.</textarea></div>
+        <div style="margin-top:14px"><label>Gaps detectados</label><input value="Multi-región (alta) · Kubernetes avanzado (media)"></div>
+        <div class="row" style="margin-top:16px"><button class="btn">Cerrar proceso</button>
+          <label style="margin:0"><input type="checkbox" style="width:auto"> Cerrar sin aprendizajes</label></div>
+      </div>
+      <div class="card" style="max-width:860px;margin-top:14px">
+        <b>Aprendizajes de todos los procesos</b>
+        <p class="muted" style="margin:8px 0">Filtrable por resultado y gap (vista completa = etapa 2).</p>
+        <div class="job"><b>Cloud Architect · AWS · rechazada</b><div class="m">gap: multi-región (alta)</div></div>
+        <div class="job"><b>Tech Lead · Naranja X · aceptada</b><div class="m">funcionó: la carta anclada a la oferta</div></div>
+      </div>
+    </section>
+
+    <!-- ============ 1 · LOGIN ============ -->
+    <section class="screen" id="s-login">
+      <div class="loginwrap card">
+        <h2 style="margin:0 0 4px;font-size:17px">MyInterviews</h2>
+        <p class="muted" style="margin:0 0 16px">Acceso privado</p>
+        <label>Email</label><input value="—">
+        <div style="margin-top:10px"><label>Contraseña</label><input type="password" value=".........."></div>
+        <p class="pill bad" style="display:inline-block;margin:12px 0">Credenciales incorrectas.</p>
+        <div><button class="btn" style="width:100%;text-align:center">Entrar</button></div>
+        <p class="muted" style="margin:12px 0 0;font-size:11px">Sin registro público · 5 intentos / 15 min por IP</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<button class="btn" id="med" onclick="medir()">Mediciones de forma</button>
+<pre id="medout"></pre>
+
+<script>
+  // navegación del mockup
+  document.querySelectorAll('#sidebar button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('#sidebar button').forEach(x=>x.classList.remove('on'));
+      document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      document.getElementById('s-'+b.dataset.s).classList.add('on');
+      document.getElementById('medout').style.display='none';
+    };
+  });
+
+  // M-1..M-4 medidos de verdad, sobre el DOM, no declarados a mano
+  const R = el => el.getBoundingClientRect();
+  const near = (a,b,tol) => Math.abs(a-b) <= tol;
+  function medir(){
+    const L=[];
+    const ok=(id,nombre,cond,detalle)=>L.push([cond,id,nombre,detalle]);
+    const T={1:'tol 4px',2:'tol 6px',3:'tol 6px',4:'tol 3px'};
+
+    // volver al pipeline para medir M-1, M-2 y M-4
+    document.querySelector('#sidebar button[data-s="pipeline"]').click();
+
+    const sb=R(document.getElementById('sidebar'));
+    const main=R(document.getElementById('main'));
+    const recsMain=[...document.querySelectorAll('#main > .screen.on .top, #main > .screen.on')];
+    // M-2 · barra lateral 240±6 y contenido en sidebar.right+24±6
+    const m2a=near(sb.width,240,6), m2b=near(R(document.getElementById('contadores')).left-sb.right,24,6);
+    ok('M-2','Navegación lateral',m2a&&m2b,
+       `ancho sidebar=${sb.width.toFixed(1)} (240±6) · contenido empieza ${(R(document.getElementById('contadores')).left-sb.right).toFixed(1)}px tras la barra (24±6)`);
+
+    // M-1 · columnas del tablero: mismo top, mismo ancho, left creciente
+    const cols=[...document.querySelectorAll('#board .col')].map(R);
+    const tops=cols.map(c=>c.top), anchos=cols.map(c=>c.width);
+    const m1top=tops.every(t=>near(t,tops[0],4)), m1ancho=anchos.every(a=>near(a,anchos[0],4));
+    const m1order=cols.every((c,i)=>i===0||c.left>cols[i-1].left);
+    ok('M-1','Columnas del tablero',m1top&&m1ancho&&m1order,
+       `${cols.length} columnas · top ${tops.map(t=>t.toFixed(1)).join('/')} · ancho ${anchos.map(a=>a.toFixed(1)).join('/')} · left creciente=${m1order}`);
+
+    // M-4 · fechas de próximas entrevistas alineadas en la misma columna + orden ascendente
+    const fechas=[...document.querySelectorAll('#agenda tbody tr td.d, #agenda tr td.d')].map(R);
+    const m4=L.length&&true;
+    const m4left=fechas.length>0&&fechas.every(f=>near(f.left,fechas[0].left,3));
+    ok('M-4','Próximas entrevistas',m4left,
+       `${fechas.length} filas · left de la fecha ${fechas.map(f=>f.left.toFixed(1)).join('/')} (tol 3px)`);
+
+    // M-3 · editor y vista previa lado a lado, mismo alto
+    document.querySelector('#sidebar button[data-s="editor"]').click();
+    const panes=[...document.querySelectorAll('#editor .pane')].map(R);
+    const m3top=panes.length===2&&near(panes[0].top,panes[1].top,4);
+    const m3alto=panes.length===2&&near(panes[0].height,panes[1].height,6);
+    const m3gap=panes.length===2&&near(panes[1].left-panes[0].right,16,4);
+    ok('M-3','Editor y vista previa',m3top&&m3alto&&m3gap,
+       `top ${panes.map(p=>p.top.toFixed(1)).join('/')} · alto ${panes.map(p=>p.height.toFixed(1)).join('/')} · gap ${(panes[1].left-panes[0].right).toFixed(1)}px (16±4)`);
+
+    const out=document.getElementById('medout');
+    out.style.display='block';
+    out.innerHTML='<h4>Mediciones de forma — viewport '+window.innerWidth+'×'+window.innerHeight+'</h4>'+
+      L.map(([good,id,nom,det])=>`<span class="${good?'y':'n'}">${good?'✔':'✘'} ${id} ${nom}</span>\n    ${det}`).join('\n\n');
+    document.querySelector('#sidebar button[data-s="pipeline"]').click();
+  }
+  window.addEventListener('load',()=>{ setTimeout(medir,120); });
+</script>
+</body>
+</html>
