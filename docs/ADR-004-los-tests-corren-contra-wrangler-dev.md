@@ -10,6 +10,22 @@ La matriz tiene 21 casos de comportamiento que tocan HTTP, D1 y una sesión con 
 
 ## Decisión
 
+La suite visible corre **contra el servidor local** para lo que es HTTP, y los casos ocultos
+también. Pero eso deja un requisito que la corrida de T-01 hizo evidente y que vale como
+regla propia:
+
+**La suite visible tiene que poder ejecutarse en un árbol pelado: sin `node_modules`, sin
+servidor y sin red.** La guardia `verify-red` clona el commit de tests en un worktree y corre
+`node --test tests/` ahí. Lo único que existe en ese árbol es lo versionado. Si un caso importa
+el módulo de la app (que importa `hono`) o pega a un endpoint, falla por **error** en vez de por
+**aserción**, y un rojo por error no verifica nada: la guardia lo rechaza, con razón.
+
+**Consecuencia de diseño, no de test:** la lógica verificable vive en módulos que **no importan
+nada salvo `node:` builtins** (`worker/lib/*`, los decisores puros de `routes/*`). El cableado de
+Hono queda fino y sin lógica propia: es lo único que no se puede probar sin instalar dependencias,
+y por eso no decide nada. Lo que el cableado podría haber decidido se verifica en el **smoke HTTP**
+contra la URL desplegada, que es donde vive la fidelidad del runtime.
+
 **La suite y los casos ocultos corren contra un `wrangler dev` local en `127.0.0.1:8787`**, con D1 local. Los casos de forma corren aparte, contra un fixture (ADR-005).
 
 ## Alternativas descartadas
