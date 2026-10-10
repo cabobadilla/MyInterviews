@@ -1,14 +1,13 @@
-✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (478.94325ms)
-✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (452.94275ms)
-✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (678.337042ms)
-✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (894.921292ms)
-✔ EXTRA · GET /api/health responde 200 con {ok:true} (23.989208ms)
-✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.544416ms)
-ℹ tests 6
+✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (304.230542ms)
+✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (366.886375ms)
+✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (389.592125ms)
+✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (380.903917ms)
+✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.344709ms)
+ℹ tests 5
 ℹ suites 0
-ℹ pass 6
+ℹ pass 5
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2636.514708
+ℹ duration_ms 1535.868
