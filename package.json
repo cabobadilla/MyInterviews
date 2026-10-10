@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.13.13",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build --mode fixtures",
+    "test": "node --test tests/",
+    "worker:dev": "npx wrangler dev --port 8787"
+  }
+}

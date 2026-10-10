@@ -1,0 +1,103 @@
+✖ C-01 · login: #login está en el DOM renderizado del fixture login.html (791.553792ms)
+✖ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (413.838459ms)
+✖ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (675.867708ms)
+✖ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (894.622084ms)
+✖ EXTRA · GET /api/health responde 200 con {ok:true} (1.718292ms)
+✖ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.486875ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2886.629291
+
+✖ failing tests:
+
+test at tests/ciclo-1.test.mjs:16:1
+✖ C-01 · login: #login está en el DOM renderizado del fixture login.html (791.553792ms)
+  AssertionError [ERR_ASSERTION]: esperaba que #login exista en el DOM renderizado de public/fixtures/login.html (caja() devolvió null)
+      at TestContext.<anonymous> (file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs:20:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: null,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/ciclo-1.test.mjs:27:1
+✖ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (413.838459ms)
+  AssertionError [ERR_ASSERTION]: esperaba que #nueva-oferta exista en el DOM renderizado de public/fixtures/nueva-oferta.html (caja() devolvió null)
+      at TestContext.<anonymous> (file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs:31:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: null,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/ciclo-1.test.mjs:38:1
+✖ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (675.867708ms)
+  AssertionError [ERR_ASSERTION]: esperaba que #detalle-oferta exista en el DOM renderizado de public/fixtures/detalle-oferta.html (caja() devolvió null)
+      at TestContext.<anonymous> (file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs:42:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: null,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/ciclo-1.test.mjs:56:1
+✖ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (894.622084ms)
+  AssertionError [ERR_ASSERTION]: esperaba que #pipeline exista en el DOM renderizado de public/fixtures/pipeline.html (caja() devolvió null)
+      at TestContext.<anonymous> (file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs:60:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: null,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/ciclo-1.test.mjs:69:1
+✖ EXTRA · GET /api/health responde 200 con {ok:true} (1.718292ms)
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/src/worker/index.js' imported from /Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs
+      at finalizeResolution (node:internal/modules/esm/resolve:241:11)
+      at moduleResolve (node:internal/modules/esm/resolve:846:10)
+      at defaultResolve (node:internal/modules/esm/resolve:973:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:708:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:728:38)
+      at ModuleLoader.resolveSync (node:internal/modules/esm/loader:766:56)
+      at #resolve (node:internal/modules/esm/loader:690:17)
+      at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:610:35)
+      at node:internal/modules/esm/loader:639:32
+      at TracingChannel.tracePromise (node:diagnostics_channel:551:22) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    url: 'file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/src/worker/index.js'
+  }
+
+test at tests/ciclo-1.test.mjs:76:1
+✖ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.486875ms)
+  Error: ENOENT: no such file or directory, open '/Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/migrations/0001_init.sql'
+      at readFileSync (node:fs:620:20)
+      at TestContext.<anonymous> (file:///Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/tests/ciclo-1.test.mjs:78:15)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/Users/christianbobadilla/.hermes/cache/scratch/MyInterviews/migrations/0001_init.sql'
+  }

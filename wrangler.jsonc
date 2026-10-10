@@ -1,0 +1,13 @@
+{
+  "name": "myinterviews-worker",
+  "main": "src/worker/index.js",
+  "assets": { "directory": "./public" },
+  "compatibility_date": "2026-01-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "myinterviews",
+      "database_id": "myinterviews-local"
+    }
+  ]
+}
