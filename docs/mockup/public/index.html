@@ -22,7 +22,7 @@
   #sidebar button:hover{background:#1c1c21;color:#e4e4e7}
   #sidebar button.on{background:#1c1c21;color:#fff;border-left-color:#818cf8}
   #sidebar .sep{margin:12px 18px;border-top:1px solid #27272a}
-  #sidebar .note{padding:0 18px;font-size:11px;color:#52525b;line-height:1.5}
+  #sidebar .note{padding:0 18px;font-size:11px;color:#8b8b96;line-height:1.5}
   #main{flex:1;padding:var(--gap);min-width:0}
   /* ---------- genéricos ---------- */
   .screen{display:none}
@@ -102,28 +102,28 @@
     <!-- ============ 2 · PIPELINE ============ -->
     <section class="screen on" id="s-pipeline">
       <div class="top">
-        <div><h2>Pipeline</h2><p>4 procesos abiertos · 1 cerrado</p></div>
+        <div><h2>Pipeline</h2><p>5 procesos abiertos · 2 cerradas</p></div>
         <button class="btn">+ Nueva oferta</button>
       </div>
       <div id="contadores">
-        <span class="c">Borrador <b>2</b></span><span class="c">Preparando <b>1</b></span>
-        <span class="c">Enviada <b>1</b></span><span class="c">Entrevistas <b>1</b></span>
+        <span class="c">Borrador <b>1</b></span><span class="c">Preparando <b>1</b></span>
+        <span class="c">Enviada <b>1</b></span><span class="c">Entrevistas <b>2</b></span>
         <span class="c">Oferta <b>0</b></span><span class="c">Rechazada <b>1</b></span>
         <span class="c">Cerrada <b>1</b></span>
       </div>
       <div id="board">
-        <div class="col"><h3>Borrador <span>2</span></h3>
+        <div class="col"><h3>Borrador <span>1</span></h3>
           <div class="job"><b>Data Engineer</b><div class="m">Globant · remoto · hace 2 h</div></div>
-          <div class="job"><b>Backend Engineer</b><div class="m">MODO · híbrido · hace 1 día</div></div>
         </div>
         <div class="col"><h3>Preparando <span>1</span></h3>
           <div class="job"><b>Platform Engineer</b><div class="m">Mercado Libre · 1 CV · sin carta</div></div>
         </div>
         <div class="col"><h3>Enviada <span>1</span></h3>
-          <div class="job"><b>Staff Engineer</b><div class="m">Ualá · enviada 05-oct</div></div>
+          <div class="job"><b>Data Platform Engineer</b><div class="m">PedidosYa · enviada 08-oct</div></div>
         </div>
-        <div class="col"><h3>Entrevistas <span>1</span></h3>
+        <div class="col"><h3>Entrevistas <span>2</span></h3>
           <div class="job"><b>SRE Engineer</b><div class="m">Auth0 · ent. 2 de 3 · 12-oct 15:00</div></div>
+          <div class="job"><b>Backend Engineer</b><div class="m">MODO · screening · 16-oct 09:00</div></div>
         </div>
         <div class="col"><h3>Cerradas <span>2</span></h3>
           <div class="job"><b>Cloud Architect</b><div class="m">AWS · rechazada · con aprendizajes</div></div>
@@ -136,7 +136,7 @@
           <tr><th>Cuándo</th><th>Puesto</th><th>Empresa</th><th>Tipo</th></tr>
           <tr><td class="d">12-oct 15:00</td><td>SRE Engineer</td><td>Auth0</td><td>técnica (2/3)</td></tr>
           <tr><td class="d">14-oct 10:30</td><td>SRE Engineer</td><td>Auth0</td><td>cultural (3/3)</td></tr>
-          <tr><td class="d">16-oct 09:00</td><td>Staff Engineer</td><td>Ualá</td><td>screening</td></tr>
+          <tr><td class="d">16-oct 09:00</td><td>Backend Engineer</td><td>MODO</td><td>screening</td></tr>
         </table>
       </div>
     </section>
@@ -350,16 +350,16 @@ Kubernetes · Terraform · AWS · Linux · Go</div>
 <pre id="medout"></pre>
 
 <script>
-  // navegación del mockup
-  document.querySelectorAll('#sidebar button').forEach(b=>{
-    b.onclick=()=>{
-      document.querySelectorAll('#sidebar button').forEach(x=>x.classList.remove('on'));
-      document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
-      b.classList.add('on');
-      document.getElementById('s-'+b.dataset.s).classList.add('on');
-      document.getElementById('medout').style.display='none';
-    };
-  });
+  // navegación del mockup — con deep-link: #pipeline, #editor, #nueva…
+  function seleccionar(nombre){
+    document.querySelectorAll('#sidebar button').forEach(x=>x.classList.toggle('on', x.dataset.s===nombre));
+    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+    const el=document.getElementById('s-'+nombre); if(el) el.classList.add('on');
+    document.getElementById('medout').style.display='none';
+    if(location.hash.slice(1)!==nombre) location.hash=nombre;
+  }
+  document.querySelectorAll('#sidebar button').forEach(b=>{ b.onclick=()=>seleccionar(b.dataset.s); });
+  window.addEventListener('hashchange',()=>{ const h=location.hash.slice(1); if(document.getElementById('s-'+h)) seleccionar(h); });
 
   // M-1..M-4 medidos de verdad, sobre el DOM, no declarados a mano
   const R = el => el.getBoundingClientRect();
@@ -369,6 +369,7 @@ Kubernetes · Terraform · AWS · Linux · Go</div>
     const ok=(id,nombre,cond,detalle)=>L.push([cond,id,nombre,detalle]);
     const T={1:'tol 4px',2:'tol 6px',3:'tol 6px',4:'tol 3px'};
 
+    const previo = location.hash.slice(1) || 'pipeline';
     // volver al pipeline para medir M-1, M-2 y M-4
     document.querySelector('#sidebar button[data-s="pipeline"]').click();
 
@@ -408,9 +409,12 @@ Kubernetes · Terraform · AWS · Linux · Go</div>
     out.style.display='block';
     out.innerHTML='<h4>Mediciones de forma — viewport '+window.innerWidth+'×'+window.innerHeight+'</h4>'+
       L.map(([good,id,nom,det])=>`<span class="${good?'y':'n'}">${good?'✔':'✘'} ${id} ${nom}</span>\n    ${det}`).join('\n\n');
-    document.querySelector('#sidebar button[data-s="pipeline"]').click();
+    seleccionar(previo);   // el mockup vuelve a donde el humano estaba mirando
   }
-  window.addEventListener('load',()=>{ setTimeout(medir,120); });
+  window.addEventListener('load',()=>{
+    const inicial = location.hash.slice(1);
+    if (inicial && document.getElementById('s-'+inicial)) seleccionar(inicial);
+  });
 </script>
 </body>
 </html>
