@@ -1,61 +1,72 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · G1 en segunda vuelta. El usuario aprobó el mockup y redefinió el alcance: el Ciclo 1 es MVP hasta el pipeline y cargar oferta. Reescribiendo 03-DEFINICION con ese corte; además entraron dos requisitos nuevos (agente que propone el CV, brief desde los datos del entrevistador).",
+  "resumen": "Ciclo 1 · G1 aprobado y fase 4 (diseño) cerrada: 7 ADRs, matriz C-01..C-24, 5 tareas con sus contratos y 3 casos ocultos. Listo para despachar al Coder.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Definición (revisión de G1)",
-  "siguiente": "Terminar 03-DEFINICION con los 3 ciclos y volver a pedir G1 (aprobación explícita).",
+  "fase_actual": "Diseño (G2)",
+  "siguiente": "Despachar T-01 al Coder con tests primero, tras correr el canario de capacidad del modelo.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
     "G1a": { "evaluado": 1, "rechazo": 0 },
-    "G1":  { "evaluado": 1, "rechazo": 1 },
-    "G2":  { "evaluado": 0, "rechazo": 0 },
+    "G1":  { "evaluado": 2, "rechazo": 1 },
+    "G2":  { "evaluado": 1, "rechazo": 0 },
     "G3":  { "evaluado": 0, "rechazo": 0 },
     "G4":  { "evaluado": 0, "rechazo": 0 },
     "G5":  { "evaluado": 0, "rechazo": 0 }
   },
-  "casos_ocultos": 0,
+  "casos_ocultos": 3,
   "modelo": { "coder": "opencode-go/glm-5.3-flash", "nota": "se valida con el canario de capacidad (preflight-model.sh) antes de despachar" },
   "mockup": {
     "url": "https://myinterviews-mockup.mkvs.workers.dev",
-    "estado": "aprobado por el usuario («me gusta el mockup»). Con el alcance recortado se le agregó la marca de ciclo (C1/C2/C3) por pantalla.",
+    "estado": "congelado, con la marca de ciclo (C1/C2/C3) por pantalla",
     "mediciones": "M-1 columnas 178,1 top / 82,4 ancho · M-2 sidebar 240,0 y contenido a 24,0 · M-3 pane top 183,2 alto 779,4 gap 16,0 · M-4 fecha left 264,5"
   },
   "despliegue": {
-    "plataforma": "Cloudflare",
-    "forma_worker": "por definir en 04-DISENO.md (G2): API con `main` (Hono) + front como assets",
-    "local": "wrangler dev — sin cuenta ni credenciales",
-    "cloud": "pendiente (G2 nombra el límite del plan que podría romper el diseño)"
+    "plataforma": "Cloudflare Workers",
+    "forma_worker": "un solo Worker con `main` (Hono) + `assets` (SPA compilada): un origen, sin CORS (ADR-001)",
+    "local": "npx wrangler dev --port 8787 con D1 local, sin cuenta ni credenciales",
+    "cloud": "npx wrangler deploy — lo hace solo Hermes. Límite que puede romperlo: CPU por request contra PBKDF2 (login → Error 1102); mitigado con PBKDF2_ITERATIONS como variable"
   },
   "fases": [
     { "id": "idea",     "nombre": "1 · Idea",                     "estado": "completa",  "gate": "G0",  "resumen": "Spec v3 verbatim + las 3 preguntas con supuesto del PO", "puntos": ["01-IDEA.md"] },
     { "id": "analisis", "nombre": "2 · Análisis",                 "estado": "completa",  "gate": "G1a", "resumen": "12 dudas resueltas, 3 huecos de esquema encontrados, corte en 3 ciclos fijado por el usuario", "puntos": ["02-ANALISIS.md"] },
-    { "id": "def",      "nombre": "3 · Definición",               "estado": "en curso",  "gate": "G1",  "resumen": "Segunda vuelta: reencuadre por ciclos tras el feedback de G1", "puntos": ["03-DEFINICION.md", "mockup"] },
-    { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "pendiente", "gate": "G2",  "resumen": "", "puntos": [] },
+    { "id": "def",      "nombre": "3 · Definición",               "estado": "completa",  "gate": "G1",  "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; C-25..C-54 definidos para sus ciclos", "puntos": ["03-DEFINICION.md"] },
+    { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "completa",  "gate": "G2",  "resumen": "7 ADRs, matriz C-01..C-24, 5 tareas con contratos, 3 casos ocultos", "puntos": ["04-DISENO.md", "05-TAREAS.md", "ADR-001..007", "contratos/"] },
     { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "pendiente", "gate": "G5",  "resumen": "", "puntos": [] }
+  ],
+  "tareas": [
+    { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "pendiente", "nota": "C-01, C-07, C-14, C-18" },
+    { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "pendiente", "nota": "C-02..C-06" },
+    { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "pendiente", "nota": "C-08..C-13" },
+    { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
+    { "id": "T-05", "titulo": "Pipeline",                             "estado": "pendiente", "nota": "C-19..C-24" }
   ],
   "historias": [
     { "id": "HU-1", "titulo": "Acceso de un solo usuario",           "ciclo": "C1", "criterios": 6 },
-    { "id": "HU-2", "titulo": "Cargar una oferta (URL o texto)",     "ciclo": "C1", "criterios": 7 },
-    { "id": "HU-3", "titulo": "Revisar y editar la oferta extraída", "ciclo": "C1", "criterios": 4 },
-    { "id": "HU-4", "titulo": "Pipeline por estado",                 "ciclo": "C1", "criterios": 4 },
-    { "id": "HU-5", "titulo": "Perfil y experiencia (import .md)",   "ciclo": "C2", "criterios": 8 },
+    { "id": "HU-2", "titulo": "Cargar una oferta (link o texto)",    "ciclo": "C1", "criterios": 7 },
+    { "id": "HU-3", "titulo": "Revisar y editar la oferta extraída", "ciclo": "C1", "criterios": 3 },
+    { "id": "HU-4", "titulo": "Pipeline por estado",                 "ciclo": "C1", "criterios": 7 },
+    { "id": "HU-5", "titulo": "Perfil y experiencia (import .md)",   "ciclo": "C2", "criterios": 5 },
     { "id": "HU-6", "titulo": "CV y carta con propuesta del agente", "ciclo": "C2", "criterios": 9 },
-    { "id": "HU-7", "titulo": "Exportar PDF y marcar Enviada",       "ciclo": "C2", "criterios": 5 },
-    { "id": "HU-8", "titulo": "Entrevistas con brief",               "ciclo": "C3", "criterios": 7 },
-    { "id": "HU-9", "titulo": "Cierre con aprendizajes",             "ciclo": "C3", "criterios": 5 }
+    { "id": "HU-7", "titulo": "Exportar PDF y marcar Enviada",       "ciclo": "C2", "criterios": 4 },
+    { "id": "HU-8", "titulo": "Entrevistas con brief",               "ciclo": "C3", "criterios": 6 },
+    { "id": "HU-9", "titulo": "Cierre con aprendizajes",             "ciclo": "C3", "criterios": 6 }
   ],
   "decisiones": [
-    { "id": "G1",  "texto": "El usuario aprobó el mockup («me gusta el mockup») y recortó el alcance: el Ciclo 1 es MVP hasta el pipeline y cargar oferta." },
-    { "id": "Q2",  "texto": "Se agrega `status_previo` a applications: el spec pide «reabrir al estado previo» y el esquema no tenía dónde guardarlo." },
-    { "id": "Q3",  "texto": "`idx_docs_actual` pasa a índice parcial ÚNICO: con el índice no único podían coexistir dos versiones «vigentes»." },
-    { "id": "Q11", "texto": "El CV lo propone un agente: el usuario ya no marca a mano qué experiencias incluir; el LLM propone selección y prioridad y el usuario acepta, saca o reordena." },
-    { "id": "Q12", "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario, anclado a la oferta y al CV vigente." }
+    { "id": "ADR-001", "texto": "Un solo Worker con `main` + `assets` en vez de Pages + Worker: un origen, sin CORS, un deploy (desvía del spec §3.1, declarado)." },
+    { "id": "ADR-002", "texto": "npm y un solo paquete, no pnpm + monorepo: pnpm no está instalado y el monorepo no resuelve nada de este ciclo." },
+    { "id": "ADR-003", "texto": "Una sola migración con el esquema completo del spec ya corregido (`status_previo`, `idx_docs_actual` UNIQUE)." },
+    { "id": "ADR-004", "texto": "La suite y los ocultos corren contra `wrangler dev` real con D1 local, no contra mocks." },
+    { "id": "ADR-005", "texto": "Los criterios de forma se miden sobre un fixture que monta los componentes reales con datos fijos." },
+    { "id": "Q2", "texto": "Se agrega `status_previo` a applications: el spec pide «reabrir al estado previo» y el esquema no tenía dónde guardarlo." },
+    { "id": "Q3", "texto": "`idx_docs_actual` pasa a índice parcial ÚNICO: con el índice no único podían coexistir dos versiones «vigentes»." },
+    { "id": "Q11", "texto": "El CV lo propone un agente (Ciclo 2): el usuario acepta, saca o reordena; nunca decide el agente." },
+    { "id": "Q12", "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)." }
   ],
   "diferido": [
-    "Ciclo 2 — perfil e importación desde .md con la biblioteca de experiencia",
+    "Ciclo 2 — perfil, importación desde .md y biblioteca de experiencia",
     "Ciclo 2 — CV y carta: agente que propone selección y prioridad de experiencias, versionado, edición manual y export a PDF",
     "Ciclo 3 — entrevistas 1..N y brief a partir de los datos del entrevistador",
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",

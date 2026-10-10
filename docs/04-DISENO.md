@@ -1,290 +1,305 @@
-# 04 — Diseño
+# 04 — Diseño · Ciclo 1 (MVP: cargar oferta + pipeline)
 
-> Fase 4. Dueño: **Arquitecto**. Decidir *cómo* se construye. Termina con
-> trazabilidad completa hacia la definición.
+- **Proyecto:** MyInterviews
+- **Fecha:** 2026-10-10
+- **Basado en:** `docs/03-DEFINICION.md` (C-01..C-24, aprobados en G1) + `docs/spec/SPEC-v3-CONFIRMADA.md`
+- **Dueño:** Arquitecto
+- **ADRs:** `docs/ADR-001` … `docs/ADR-007`
 
-- **Proyecto:**
-- **Fecha:**
-- **Basado en:** `03-DEFINICION.md`
+---
 
-## Arquitectura
+## 1. Qué se construye en este ciclo
+
+Un Worker de Cloudflare que sirve **una SPA y su API**, con base D1, donde un único
+usuario entra con su credencial, pega el link o el texto de una oferta, obtiene los
+campos extraídos por LLM (revisables y corregibles a mano) y ve la postulación creada en
+el pipeline.
+
+**No entra:** perfil, experiencia, CV, carta, PDF, entrevistas, cierre. Sus criterios ya
+están definidos en `03-DEFINICION.md` (los ciclos 2 y 3) y esperan a sus ciclos.
+
+## 2. Arquitectura
 
 ### Componentes
 
 | Componente | Responsabilidad | Límite |
 |---|---|---|
-| … | … | … |
+| `worker/index.js` | app Hono: monta rutas, aplica el middleware de sesión, sirve la SPA | no habla D1 directo |
+| `worker/middleware/auth.js` | verifica la cookie firmada; sin sesión → `401` | no decide negocio |
+| `worker/routes/*` | HTTP: valida entrada, llama repos y llm, arma respuesta | no conoce SQL |
+| `worker/repos/*` | **único** acceso a D1 | no conoce HTTP |
+| `worker/llm/*` | habla con OpenRouter, reduce HTML, valida con Zod | no conoce D1 ni HTTP |
+| `worker/lib/*` | sesión (HMAC), rate limit, esquemas Zod | sin efectos |
+| `app/*` (SPA) | UI | **nunca** llama a OpenRouter: todo pasa por la API |
 
-### Flujo de datos
+### Flujo de datos — cargar una oferta
 
-> Diagrama o descripción paso a paso.
+1. La SPA manda `POST /api/offers/extract` con `{fuente:'texto'|'url', texto?|url?}` y la cookie.
+2. `middleware/auth` valida la cookie; si no, `401` **antes** de tocar nada.
+3. Si es `url`: `llm/reduce_html.js` descarga (cap 500 KB) y reduce a texto.
+4. Se trunca a ~15.000 caracteres **solo para el prompt** si hace falta, y se registra el
+   truncado. **`raw_text` guarda el texto completo**: lo que se recorta es lo que ve el
+   modelo, nunca lo que queda almacenado.
+5. `llm/extract_offer.js` llama al gateway; valida con Zod; si falla, **1 reintento**
+   incluyendo el error de validación en el prompt.
+6. Se guarda `job_offers` con `extracted_json`, `extraction_status` y `campos_faltantes_json`.
+7. Se crea la `applications` ligada, en `borrador`.
+8. La SPA refresca el pipeline; la nueva fila aparece **sin recargar**.
 
-### Diagrama
-
-> Opcional: generar con la skill `architecture-diagram`.
-
-## Contratos
-
-> Lo bastante precisos para que el Coder no tenga que adivinar nada.
-
-### API / Interfaces
+### Contratos
 
 ```
-<endpoint o firma>
-Entrada: …
-Salida: …
-Errores: …
+POST /api/auth/login      Entrada: {email, password}
+                          Salida 200: {ok:true} + Set-Cookie de sesión
+                          Errores: 401 genérico · 429 si superó 5/15min
+POST /api/auth/logout     Salida 200 y cookie invalidada
+GET  /api/session         Salida 200 {autenticado:true|false}   (para decidir login vs app)
+
+POST /api/offers/extract  Entrada: {fuente:'texto'|'url', texto?, url?}
+                          Salida 201: {oferta, aplicacion}
+                          Errores: 400 sin fuente · 422 URL no descargable o >500 KB · 502 LLM caído
+GET  /api/offers          Salida 200: {ofertas:[…]}
+GET  /api/offers/:id      Salida 200: {oferta} · 404
+PUT  /api/offers/:id      Entrada: campos de la oferta   Salida 200: {oferta}
+
+GET  /api/applications    Salida 200: {aplicaciones:[…], contadores:{borrador:n, …}}  (los 7 estados, siempre)
+POST /api/applications    Entrada: {offer_id}            Salida 201: {aplicacion} en borrador
+GET  /api/interviews/proximas  Salida 200: {entrevistas:[]} ordenadas ascendente
 ```
 
 ### Esquemas de datos
 
+`OfferJSON` (canónico, spec §4.1) validado con Zod:
+
 ```
-<estructura>
+{ titulo, empresa, ubicacion, modalidad, seniority,
+  salario:{texto,min,max,moneda} | ausente,
+  resumen, responsabilidades[], requisitos_obligatorios[],
+  requisitos_deseables[], skills[{nombre,obligatoria}],
+  beneficios[], proceso_entrevistas[{paso,descripcion}],
+  campos_faltantes[], confianza{titulo,empresa} }
 ```
 
-## Stack y dependencias
+Tablas del ciclo: `job_offers`, `applications`, `login_attempts`. El esquema completo
+(incluidas las tablas de C2/C3) entra en `0001_init.sql` — ver **ADR-003**.
+
+## 3. Stack y dependencias
 
 | Elección | Versión | Justificación |
 |---|---|---|
-| … | … | … |
+| Hono | última estable | el spec §3.1 lo fija; ya probado en `AgenticCMS` |
+| React + Vite | última estable | confirmado por el usuario (spec §9) |
+| Zod | última estable | validación del JSON del LLM (spec §4) |
+| D1 (binding `DB`) | — | spec §3.1 |
+| OpenRouter | API estable | spec §9 (v3) |
+| Node `node:test` | el del entorno | la suite del harness ya corre así |
+| `npx wrangler` | última | dev local y deploy |
 
-## Despliegue  ⭐ OBLIGATORIA
+**Gestor de paquetes: npm** — ver **ADR-002**.
 
-> **El diseño no está terminado sin esto.** «Se despliega en Cloudflare» no es una
-> respuesta: es el nombre de la plataforma. Ver la skill **`cloudflare-architecture`**
-> para los límites reales, la elección de bindings y las trampas verificadas.
->
-> **El despliegue se define para DOS entornos, no uno:** local y cloud. Un diseño
-> que solo describe producción obliga a improvisar en la máquina de desarrollo —
-> y ahí es donde aparece «en mi máquina funciona».
+## 4. Despliegue  ⭐
 
 ### Todo lo que se publica
 
-> **«Despliegue» no es sinónimo de «el producto».** Declarar **todo** lo que queda
-> publicado, con plataforma, dueño y comando. En el harness hay normalmente **dos**:
-
 | Qué | Dónde | Quién | Cómo |
 |---|---|---|---|
-| **El producto** | … | el Orquestador | … |
-| **El tablero** (`progreso.html`) | GitHub Pages (harness) | el Orquestador | `scripts/update-status.sh --push` |
+| **El producto** (ciclo 1) | Cloudflare Workers (`myinterviews.mkvs.workers.dev`) | el Orquestador | `npx wrangler deploy` |
+| **La vista previa del ciclo** | la **misma URL** del producto (ver abajo) | el Orquestador | `npx wrangler deploy` + smoke |
+| **El tablero** | Cloudflare Worker `myinterviews-tablero` | el Orquestador | `./scripts/update-status.sh . --publicar` |
+| **El mockup congelado** | Cloudflare Worker `myinterviews-mockup` | el Arquitecto | `npx wrangler deploy` en `docs/mockup/` |
 
-Un diseño que menciona un solo destino deja creyendo que hay uno.
+### Qué plataforma
 
-### Qué plataforma  ⭐ OBLIGATORIA
+**Cloudflare Workers.** El artefacto tiene **código en runtime** (API, D1, secretos), y
+eso descarta GitHub Pages: Pages no corre un script. Además el repo del proyecto es
+**público**, así que la restricción de Pages (solo repos públicos) no aplica, pero la
+razón de fondo sí: hay API.
 
-> **Decide el Arquitecto, no el gusto.** La pregunta no es «¿dónde me gusta
-> desplegar?» sino **«¿qué tiene que hacer esto en runtime?»**.
+### Vista previa por ciclo
 
-| El artefacto es… | Plataforma | Por qué |
-|---|---|---|
-| **Solo HTML/CSS/JS estático** (sin código en el servidor) | **GitHub Pages** | Cero configuración, **cero token**, cero cuenta que administrar. El sitio ya existe: la URL aparece al hacer push. |
-| **Con código en runtime** (Worker, API, bindings, estado, secretos) | **Cloudflare Workers** | Es la única que ejecuta. Pages no corre un script. |
-
-**El corte suele ser de ETAPA, no de proyecto.** Un producto puede empezar estático y
-volverse dinámico: la decisión se declara **con la etapa**, y se revisa cuando el
-diseño cambia de etapa. «Ya veremos» no es una decisión.
-
-⚠️ **Repos privados:** Pages gratis publica **solo repos públicos**. Si el repo es
-privado, esa razón sola manda a Cloudflare.
-
-⚠️ **Y el cruce con la vista previa por ciclo.** Pages sirve **una sola rama**, así que
-no da una URL por rama gratis como Workers Builds. Para un artefacto estático **no hace
-falta**: se publica el ciclo en una **ruta del mismo sitio**
-(`https://<owner>.github.io/<repo>/preview/<ciclo>/`) — mismo origen que el tablero,
-sin token y sin beta. Con Cloudflare, el equivalente es una **Preview URL**.
-**La plataforma se elige por lo que corre; la vista previa se resuelve dentro de la
-plataforma elegida.**
-
-### Vista previa por ciclo  ⭐ OBLIGATORIA
-
-> **Un ciclo no termina sin una URL que el humano pueda abrir.** El PO trabaja
-> **remoto**: «corré esto en local» no es una instrucción, es un callejón sin salida.
-> Un diseño que solo describe el despliegue de producción deja al PO sin forma de
-> revisar nada hasta el final.
-
-Declarar **cómo se ve el trabajo de cada ciclo antes de que exista producción**:
-
-| | |
-|---|---|
-| **Mecanismo** | Cloudflare **Previews** (`npx wrangler preview`) o **Workers Builds** (Preview URL automática por rama). **NO** `--preview-alias`: Cloudflare lo desaconseja explícitamente — *«los Aliased Version URLs no crean recursos aislados por rama»*. |
-| **Quién publica** | El **Orquestador**. El Coder **no despliega** y no tiene token. |
-| **Cuándo** | Al cerrar cada ciclo, junto con el smoke. |
-| **Dónde queda** | En el tablero y en el handoff: **la URL se entrega, no se describe**. |
-
-⚠️ **Las Version URLs (`wrangler versions upload`) NO sirven para esto**: usan los
-recursos de **producción**. Cloudflare: *«Do not use Version URLs for branch or pull
-request testing.»*
-
-⚠️ **Si el mecanismo está en beta o no se probó, decirlo.** Diseñar sobre una beta no
-verificada es el mismo error que asumir que el PO está en la máquina.
+- **Mecanismo:** como el Ciclo 1 es el **primer** deploy del producto, la URL de
+  producción *es* la vista previa. El Worker se despliega en el **dominio propio** del
+  Worker, no en producción de nadie más, así que la revisión del PO es directa.
+- **Quién publica:** el **Orquestador**. El Coder **no despliega** y **no tiene token**.
+- **Cuándo:** al cerrar el ciclo, junto con el smoke.
+- **Dónde queda:** en el tablero y en el handoff — **la URL se entrega, no se describe.**
+- ⚠️ **Para los ciclos siguientes** (donde ya hay producción que no hay que pisar) el
+  mecanismo pasa a **Workers Builds / Preview URL por rama**. `--preview-alias` está
+  **descartado** (Cloudflare lo desaconseja) y las **Version URLs** también (usan
+  recursos de producción). Se declara acá para no improvisarlo después.
 
 ### Forma del Worker
 
 | Opción | Cuándo |
 |---|---|
-| **A · Solo assets** (sin `main`) | App estática. Requests de assets gratis e ilimitados |
-| **B · Assets + Worker** | App estática **y** API. Solo se factura lo que toca el script |
-| **C · Worker + bindings** | El caso B más almacenamiento |
+| A · Solo assets | app estática |
+| **B · Assets + Worker** | app estática **y** API ← **elegida** |
+| C · Worker + bindings | B más almacenamiento ← **parcialmente**: además hay D1 |
 
-**Elegida:** … **Por qué:** …
+**Elegida: B/C — un solo Worker con `main` (Hono) y `assets` apuntando a la SPA
+compilada.** Por qué: un deploy, un origen, **cero CORS**, y una sola URL que entregar.
+Ver **ADR-001** (incluye las alternativas descartadas, entre ellas Pages).
 
 ### Entornos
 
 | | Local | Cloudflare |
 |---|---|---|
-| Comando | `npx wrangler dev` (¿qué puerto?) | `npx wrangler deploy` |
-| Qué corre | … | … |
-| **Qué NO corre igual** | … | — |
+| Comando | `npx wrangler dev --port 8787` | `npx wrangler deploy` |
+| Qué corre | Worker real + **D1 local** (Miniflare) + la SPA compilada | Worker + D1 real + assets |
+| **Qué NO corre igual** | no aplica los límites del plan (CPU, cuotas); el D1 local arranca **vacío** y sin migrar hasta correr `d1 migrations apply --local` | los límites del plan **sí** aplican |
 
-> **Paridad declarada, no supuesta.** El emulador local **no** aplica los límites del
-> plan: algo que pasa en local puede fallar en producción.
+**Paridad declarada, no supuesta:** el emulador **no** aplica el techo de CPU, así que
+un login que pasa en local puede dar **Error 1102** en el edge. Por eso el presupuesto de
+CPU de abajo es explícito y se mide.
 
-### Dónde corren las pruebas  ⭐ OBLIGATORIA
-
-> La pregunta «¿las pruebas corren en local o en Cloudflare?» **se responde acá**, no
-> se deja abierta. Y la respuesta no es «una de las dos».
-
-**Dos niveles, con propósitos distintos:**
+### Dónde corren las pruebas  ⭐
 
 | | **Suite** | **Smoke** |
 |---|---|---|
-| **Dónde** | **Local** (`wrangler dev` / Miniflare) | **Cloudflare** (la URL real) |
-| **Cuándo** | Antes de cada merge, en cada ciclo | Después de cada deploy |
-| **Qué prueba** | El **comportamiento** (la matriz de casos) | Que **lo desplegado es lo construido** y funciona en el edge |
-| **Costo** | Cero cuota, cero red, determinista | Consume cuota real |
-| **Quién la corre** | El **Coder** (y Hermes la verifica) | **Hermes**, el único que despliega |
+| **Dónde** | **Local** (`wrangler dev` en `127.0.0.1:8787`) | **Cloudflare** (la URL real) |
+| **Cuándo** | antes de integrar, en cada tarea | después de cada deploy |
+| **Qué prueba** | el comportamiento de la matriz (C-01..C-24) | que lo desplegado es lo construido |
+| **Quién la corre** | el **Coder** (Hermes la verifica) | **Hermes** |
 
-**Por qué la suite NO corre en Cloudflare:** es determinista, no depende de la red ni
-del plan, y no gasta la cuota diaria. Una suite que corre contra producción es lenta,
-frágil, y **cambia el veredicto según el día**.
-
-**Por qué el deploy SÍ necesita verificación en el edge:** el emulador local no aplica
-los límites del plan (10 ms de CPU, cuotas, 429). **Un diseño que pasa en local puede
-dar Error 1102 en producción.** El smoke test es chico y explícito: la URL responde,
-los assets cargan, la versión desplegada es la construida, y nada sensible quedó
-público.
-
-> **El smoke no reemplaza la suite, y la suite no reemplaza el smoke.** Uno prueba que
-> el producto hace lo que dice; el otro, que lo que está publicado es ese producto.
-
-**Definir:** qué corre en la suite · qué corre en el smoke · quién despliega.
+La suite **no** corre contra producción: es determinista y no gasta cuota. El smoke es
+chico: la URL responde `200`, la SPA carga, `POST /api/auth/login` con las credenciales
+reales devuelve cookie, un `GET /api/offers` **sin** cookie devuelve `401`, y el
+`#pipeline` se ve autenticado. **Los casos ocultos** corren después, también contra
+local, tras el commit final del Coder.
 
 ### Bindings
 
-| Binding | Tipo (KV / D1 / R2 / DO / AI) | Para qué |
+| Binding | Tipo | Para qué |
 |---|---|---|
-| … | … | … |
+| `DB` | D1 | `job_offers`, `applications`, `login_attempts` |
+
+**R2 no se declara en este ciclo** (no hay PDFs todavía): un binding que nadie usa es un
+permiso de más.
 
 ### Límite que puede romperlo
 
-> ¿Cuál es el límite del plan que este diseño puede agotar, y **qué pasa** cuando se
-> agota? (En Free, agotar requests con `run_worker_first` devuelve **429** y el sitio
-> **no** cae de vuelta a los assets.)
-
-- Límite: … → Consecuencia: …
+- **Límite: CPU por request (10 ms en Free) contra PBKDF2 a 600k iteraciones.**
+  Consecuencia: el login devuelve **Error 1102** y nadie entra — la app queda inaccesible
+  por completo, porque sin sesión no hay nada. **Mitigación:** `PBKDF2_ITERATIONS` es
+  variable, se mide con el smoke y se baja si hace falta, dejándolo escrito.
+- **Límite: tamaño de fila de D1 contra `raw_text`.**
+  Consecuencia: una oferta enorme no se puede guardar. **Mitigación:** cap de 500 KB en la
+  descarga y truncado a ~15k para el prompt.
 
 ### Presupuesto de CPU
 
-> Qué hace el Worker **en el camino del request**. En Free el techo es **10 ms**:
-> alcanza para headers, redirects, validar un token, proxear. No para parsear
-> payloads grandes, plantillas pesadas o criptografía en bucle.
-
-- …
+- **Camino del request normal:** leer la cookie, verificar HMAC (barato), una o dos
+  consultas D1, serializar JSON. Holgado dentro del techo.
+- **El caso caro es el login:** PBKDF2. Es el único lugar con criptografía en bucle; queda
+  aislado en `lib/session.js` y parametrizado justamente por esto.
+- **La extracción LLM no consume CPU del Worker:** espera al `fetch`. El tiempo de espera
+  cuenta contra el límite de **duración**, no de CPU.
 
 ### Secretos
 
-> Dónde viven. Producción: `npx wrangler secret put <nombre>`. Local: `.dev.vars`
-> (y en `.gitignore`). **Nunca en el repo, nunca en el directorio de assets.**
+| Secreto | Dónde | Quién lo pone |
+|---|---|---|
+| `OPENROUTER_API_KEY` | Secret del Worker | el Orquestador, desde `~/.hermes/.env` |
+| `APP_EMAIL`, `APP_PASSWORD_HASH` | Secrets del Worker | idem |
+| `SESSION_SECRET` (32 bytes) | Secret del Worker | idem |
+| `PBKDF2_ITERATIONS`, `LLM_MODEL_EXTRACCION` | **vars** públicas de `wrangler.jsonc` | versionadas (no son secretos) |
 
-- …
+Local: `.dev.vars` (en `.gitignore`). **Nunca** en el repo, **nunca** en el directorio de
+assets. El valor de `APP_PASSWORD_HASH` se genera **fuera** del entorno del Coder.
 
 ### Rollback
 
-- Comando: `npx wrangler rollback <version-id>` → **qué se restaura:** …
+- `npx wrangler rollback <version-id>` → restaura el **código** del deploy anterior.
+- **El esquema no se revierte** (las migraciones de D1 no van hacia atrás). Se documenta
+  la migración aplicada y, si hubo error, se corrige hacia adelante con una nueva.
 
 ### ¿Hay algo en el directorio de assets que NO debe ser público?
 
-> Todo lo que está ahí **se publica**. `.env`, source maps y `_worker.js` incluidos.
+- El directorio de assets es `public/`, que es **salida de `vite build`**. Riesgos a
+  vigilar: **source maps** (se desactivan en el build de producción) y `.dev.vars`
+  (fuera de `public/`, en `.gitignore`). No hay claves en el front: la de OpenRouter vive
+  en un Secret y solo la lee el Worker.
 
-- …
+## 5. Decisiones (ADRs)
 
-## Decisiones (ADRs)
+- `ADR-001-un-solo-worker-hono-assets.md` — un Worker con `main` + `assets`, **no** Pages
+- `ADR-002-npm-no-pnpm.md` — npm en lugar de pnpm
+- `ADR-003-esquema-completo-en-la-primera-migracion.md` — `0001_init.sql` con todo el esquema + 2 correcciones
+- `ADR-004-los-tests-corren-contra-wrangler-dev.md` — sin mocks, contra el Worker real
+- `ADR-005-la-forma-se-mide-sobre-un-fixture.md` — cómo se mide la clase `forma`
+- `ADR-006-extraccion-prompt-zod-reintento.md` — la estrategia de salida estructurada
+- `ADR-007-rate-limit-en-d1.md` — el contador de intentos vive en D1
 
-> Una decisión técnica no obvia = un ADR. Ver `templates/ADR.md`.
+## 6. Matriz de casos de prueba  ⭐
 
-- `ADR-001-<tema>.md` — …
-- `ADR-002-<tema>.md` — …
-
-## Matriz de casos de prueba  ⭐ OBLIGATORIA
-
-> **Los casos se identifican acá, en el diseño.** No son código: son el contrato de
-> qué significa "terminado". El Coder los traduce a tests ejecutables y **puede
-> agregar los que se le ocurran; no puede quitar ninguno.**
->
-> **Por qué acá y no en el Coder.** El Coder es dueño de los tests, pero si además
-> *inventa los casos*, decide qué significa "hecho" — y eso es alcance, con disfraz
-> de test. `ROLES.md` ya dice que el Coder no decide alcance.
-
-| ID | Caso | Criterio de origen | Tipo | Observable esperado |
+| ID | Caso | Criterio de origen | Clase | Observable esperado |
 |---|---|---|---|---|
-| `C-01` | … | HU-1 / #1 | estructura / comportamiento / umbral / empaquetado | qué se mide y con qué límite |
-
-**Reglas de la matriz:**
-
-1. **Toda fila nace de un criterio de aceptación de la fase 3.** Un caso sin
-   criterio de origen es alcance no pedido.
-2. **El `ID` es el contrato.** El test que lo cubre **se nombra con ese ID**
-   (`test('C-01 · …')`). Así la cobertura es **comprobable**:
-   `scripts/check-coverage.sh <proyecto>` verifica que todo ID de la matriz tiene
-   su test. Sin el ID en el nombre, la cobertura es una opinión.
-3. **Todo criterio de aceptación tiene ≥1 caso.** Un criterio sin caso es un
-   criterio que nadie va a verificar.
-4. **`Observable esperado`: qué se mide.** No "funciona bien" — "el contador
-   muestra `02/10` tras avanzar una piel". Si no se puede escribir el observable,
-   el caso no está definido.
-5. **Los casos de tipo `comportamiento` ejecutan el artefacto**, no lo leen. Un
-   test que solo comprueba que existe el CSS que *haría* la transición no verifica
-   la transición.
-6. **Los umbrales se escriben numéricos y con su límite** (contraste ≥ 4.5:1,
-   respuesta < 200 ms), nunca como "aceptable".
+| `C-01` | Sin sesión se ve el login | C-01 | existencia | `#login` existe en el DOM tras `GET /` |
+| `C-02` | `/api/*` sin cookie | C-02 | comportamiento | `GET /api/offers` sin cookie → `401`; **0** consultas D1 |
+| `C-03` | Login falla, error genérico | C-03 | comportamiento | email inexistente y contraseña mala → **mismo status y mismo cuerpo** |
+| `C-04` | 6º intento bloqueado | C-04 | comportamiento | 5 fallos → 6º responde `429` **sin verificar la contraseña** |
+| `C-05` | Cookie de sesión y logout | C-05 | comportamiento | `Set-Cookie` con `HttpOnly`, `Secure`, `SameSite=Strict`; tras logout la cookie vieja → `401` |
+| `C-06` | Cookie manipulada o vencida | C-06 | comportamiento | firma alterada → `401` + cookie de borrado |
+| `C-07` | Pantalla de nueva oferta | C-07 | existencia | `#nueva-oferta` existe autenticado |
+| `C-08` | Texto → oferta + postulación | C-08 | comportamiento | `POST /api/offers/extract` → oferta con `titulo`/`empresa` **y** `applications.status='borrador'` |
+| `C-09` | URL → descarga y reduce | C-09 | comportamiento | con fetch inyectado que devuelve HTML, la oferta sale con los campos del texto |
+| `C-10` | Extracción sin salario → parcial | C-10 | comportamiento | `extraction_status='parcial'` y `campos_faltantes_json` ⊇ {salario, beneficios} |
+| `C-11` | JSON inválido tras 1 reintento | C-11 | comportamiento | LLM falso devuelve basura 2 veces → `fallida`, con `raw_text` y `extraction_error`, **y la oferta se crea igual** |
+| `C-12` | URL no descargable | C-12 | comportamiento | fetch que falla → error explícito que ofrece pegar texto y **0** filas nuevas |
+| `C-13` | Texto de 40.000 caracteres | C-13 | comportamiento | al LLM le llegan **≤15.000** y la fila registra el truncado |
+| `C-14` | Detalle de la oferta | C-14 | existencia | la pantalla muestra los campos de esa oferta |
+| `C-15` | Editar una oferta `fallida` | C-15 | comportamiento | `PUT /api/offers/:id` → `200` y el valor persiste |
+| `C-16` | Campos faltantes resaltados | C-16 | comportamiento | los inputs de `campos_faltantes_json` llevan la clase de resalte |
+| `C-17` | Texto original consultable | C-17 | comportamiento | el detalle expone `raw_text` y `source_url` tal como se guardaron |
+| `C-18` | Pantalla de pipeline | C-18 | existencia | `#pipeline` existe autenticado |
+| `C-19` | 7 contadores por estado | C-19 | comportamiento | 7 contadores presentes, cada uno con su número, incluidos los ceros |
+| `C-20` | Alta en vivo | C-20 | comportamiento | tras crear la oferta, la fila nueva está en el pipeline **sin reload** |
+| `C-21` | Próximas entrevistas ordenadas | C-21 | comportamiento | 3 entrevistas futuras desordenadas → lista ascendente; sin entrevistas → lista vacía |
+| `C-22` | Columnas del tablero alineadas | C-22 | forma | **M-1**: mismo `top` ±4px, mismo ancho ±4px, `left` creciente |
+| `C-23` | Barra lateral y contenido | C-23 | forma | **M-2**: sidebar `240px ±6`; contenido a `sidebar.right + 24px ±6` |
+| `C-24` | Fecha alineada | C-24 | forma | **M-4**: `left` de la fecha igual entre filas ±3px |
 
 ### Cobertura combinada
 
-Si hay ejes que se multiplican (N variantes × M estados), **la matriz tiene una
-fila por combinación o una fórmula explícita** (`C-40..C-59: 10 pieles × 2 modos`).
-Una fórmula sin filas es donde se esconden los literales escritos en duro.
+No hay ejes que se multipliquen dentro del Ciclo 1: los 3 resultados de extracción
+(`exitosa`/`parcial`/`fallida`) están cubiertos uno por uno (`C-08`, `C-10`, `C-11`) y no
+se combinan con un segundo eje. El segundo eje (7 estados × documentos) llega en C2/C3.
 
-### Casos ocultos  (2–4 por ciclo)
+### Casos ocultos
 
-> Además de esta matriz **visible**, el Arquitecto escribe **2–4 casos ocultos** del
-> mismo ciclo, **mismo momento, distinto destino**: `oculto/<proyecto>/ciclo-<n>.test.mjs`
-> en el harness, **fuera del alcance del Coder**. Se ejecutan en **G5** con
-> `scripts/hidden-cases.sh run <proyecto> <ciclo>`, **solo después del commit final
-> del Coder**. Un caso oculto rojo es un **hallazgo de QA** (la matriz visible era más
-> angosta que el criterio), y al cierre **se promueve a esta matriz**.
->
-> **Solo en perfiles `producto` y `cliente`** (ver `PROCESS.md` §2). El volumen importa:
-> más de 4 es una segunda matriz en la sombra, y eso rompe que el contrato sea visible.
+**3**, en el harness: `oculto/MyInterviews/ciclo-1.test.mjs`. Mismo momento, distinto
+destino — endurecen criterios ya visibles. Se ejecutan en **G5**, después del commit
+final del Coder, con `./scripts/hidden-cases.sh run <proyecto> 1`.
 
 ### Clase de criterio
 
-> Cada fila declara la **clase** de su criterio de origen (de la fase 3):
-> `existencia` | `comportamiento` | `forma`. Un caso de clase `forma` **mide geometría**
-> (`getBoundingClientRect()` con tolerancia), no la describe. Es lo que evita el
-> learning #46: seis casos en verde con la forma equivocada.
+Cada fila declara la clase de su criterio de origen. Las de clase `forma` (`C-22`,
+`C-23`, `C-24`) **miden geometría** con `getBoundingClientRect()` sobre el fixture
+(**ADR-005**), no la describen.
 
-## Trazabilidad
+## 7. Trazabilidad
 
-> El eslabón completo: **criterio → caso → tarea → test**. Si falta un eslabón, algo
-> se está colando sin verificar.
+| Criterio (fase 3) | Casos | Tarea(s) |
+|---|---|---|
+| C-01, C-07, C-14, C-18 | `C-01`, `C-07`, `C-14`, `C-18` | T-01 |
+| C-02, C-03, C-04, C-05, C-06 | `C-02`, `C-03`, `C-04`, `C-05`, `C-06` | T-02 |
+| C-08, C-09, C-10, C-11, C-12, C-13 | `C-08`, `C-09`, `C-10`, `C-11`, `C-12`, `C-13` | T-03 |
+| C-15, C-16, C-17 | `C-15`, `C-16`, `C-17` | T-04 |
+| C-19, C-20, C-21, C-22, C-23, C-24 | `C-19`, `C-20`, `C-21`, `C-22`, `C-23`, `C-24` | T-05 |
 
-| Criterio (fase 3) | Casos | Tarea(s) | Test que lo cubre |
-|---|---|---|---|
-| HU-1 / #1 | `C-01`, `C-02` | T-1 | `C-01 · …` |
+Cada criterio tiene ≥1 caso; cada caso nace de un criterio; cada tarea apunta a ≥1 caso.
+**Sin huérfanos en ninguna dirección.**
+
+## 8. Corte y complejidad combinada
+
+Hay complejidad combinada (4 pantallas × 7 estados × 2 caminos de entrada × 3 resultados
+de extracción). **El corte es el que fijó el usuario en G1:** el Ciclo 1 entrega cargar la
+oferta y el pipeline; los ciclos 2 y 3 ya están definidos y numerados en `03`. El diseño
+**no anticipa** pantallas ni lógica de C2/C3 más allá del esquema (**ADR-003**).
 
 ---
 
-**Gate G2:** todo criterio tiene ≥1 caso **con observable esperado**, todo caso nace
-de un criterio, toda tarea apunta a ≥1 caso, cada ADR tiene alternativas descartadas,
-y **existe la sección de Despliegue** que distingue **local** de **cloud** y declara
-el límite del plan que podría romper el diseño.
+**Gate G2:** todo criterio tiene ≥1 caso con observable; todo caso nace de un criterio;
+toda tarea apunta a ≥1 caso; cada ADR tiene alternativas descartadas; y está la sección
+de Despliegue con local y cloud, la forma del Worker y el límite del plan que podría
+romperlo.
