@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="60">
+<title>Avance · MyInterviews</title>
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--text:#e6edf3;
+    --muted:#8b949e;--accent:#58a6ff;--ok:#3fb950;--run:#d29922;--blk:#f85149;--def:#a371f7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 24px 64px}
+  header.top{border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:28px}
+  h1{margin:8px 0 4px;font-size:30px}
+  .sub{color:var(--muted);margin:0}
+  .kpis{display:flex;flex-wrap:wrap;gap:24px;margin-top:16px}
+  .kpi b{font-size:20px}
+  .kpi span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .frescura{font-size:13px;margin-top:10px}
+  .frescura.amb{color:var(--run)} .frescura.rojo{color:var(--blk)} .frescura.ok{color:var(--ok)}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:36px 0 4px}
+  .h2sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px;border-bottom:1px solid var(--border)}
+  td{padding:8px;border-bottom:1px solid var(--surface2)}
+  td.num{font-variant-numeric:tabular-nums;text-align:right}
+  code{font:12px ui-monospace,Menlo,monospace;color:var(--accent);background:var(--surface2);padding:2px 6px;border-radius:4px}
+  ul.lista{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  ul.lista li{display:grid;grid-template-columns:22px 52px 1fr;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+  .tk-estado{color:var(--muted)} .tk-id{color:var(--muted);font-variant-numeric:tabular-nums}
+  li.ok .tk-estado{color:var(--ok)} li.run .tk-estado{color:var(--run)} li.blk .tk-estado{color:var(--blk)}
+  .caja{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .fuente{display:block;color:var(--muted);font-size:11px;margin-top:6px}
+  .chip{font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(88,166,255,.15);color:var(--accent)}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sub">Tablero de avance · proceso idea → pruebas</div>
+    <h1>MyInterviews</h1>
+    <p class="sub">Ciclo 1 · Etapa 1. Fases 1–3 escritas y el mockup publicado. Esperando el gate humano G1 (aprobación de criterios y corte en etapas).</p>
+    <div class="kpis">
+      <div class="kpi"><b>0%</b><span>Tareas</span></div>
+      <div class="kpi"><b>0/2</b><span>Completadas</span></div>
+      <div class="kpi"><b>Ciclo 1</b><span>Ciclo</span></div>
+      <div class="kpi"><b>producto</b><span>Perfil</span></div>
+    </div>
+    <p class="frescura" id="frescura">generado_en 2026-10-10T11:07:31Z · commit_sha 8194896
+      · <span id="hace">calculando…</span></p>
+  </header>
+
+  <h2>A · Criterios de aceptación</h2>
+  <p class="h2sub">El contrato. Un criterio cubierto pero rojo y uno sin test se ven distinto.</p>
+  <table><thead><tr><th>ID</th><th>Clase</th><th>Cobertura</th><th>Oculto</th></tr></thead>
+  <tbody><tr>
+    <td><code>C-01</code></td><td>comportamiento</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-02</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-40</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-41</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-42</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-43</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-44</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-45</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-46</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-47</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-48</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-49</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-50</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-51</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-52</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-53</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-54</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-55</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-56</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-57</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-58</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr><tr>
+    <td><code>C-59</code></td><td>—</td>
+    <td>✗ sin test</td>
+    <td>—</td></tr></tbody></table>
+  <span class="fuente">fuente: docs/04-DISENO.md + tests/ (grep)</span>
+
+  <h2>B · Integridad por tarea</h2>
+  <div class="caja">
+    <p>Sello: <span class="chip">sin sello</span> · RED: tests-finales vs implementación previa · mutación: sin dato · árbol: sucio</p>
+  </div>
+  <span class="fuente">fuente: freeze-tests.sh verify · git status --porcelain · docs/06-QA-REPORT.md</span>
+
+  <h2>C · Gates</h2>
+  <table><thead><tr><th>Gate</th><th class="num">Evaluado</th><th class="num">Rechazó</th><th class="num">Tasa</th></tr></thead>
+  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
+  <span class="fuente">fuente: estado.json → gates (lo escribe review.sh)</span>
+
+  <h2>D · Costo</h2>
+  <div class="caja">
+    <p><b>USD 0</b> · 0 tokens in · 0 tokens out · 0 corrida(s)</p>
+  </div>
+  <span class="fuente">fuente: docs/corridas/*.json (sumado, nunca estimado)</span>
+
+  <h2>E · Lo publicado</h2>
+  <div class="caja">
+    <p>Producto: sin URL</p>
+    <p>Mockup: <a href="https://myinterviews-mockup.mkvs.workers.dev">https://myinterviews-mockup.mkvs.workers.dev</a></p>
+  </div>
+  <span class="fuente">fuente: estado.json → despliegue (lo escribe deploy.sh) · mockup</span>
+
+  <h2>Tareas del ciclo</h2>
+  <ul class="lista"><li class="wait"><span class="tk-estado">○</span>
+    <span class="tk-id">T-1</span><span class="tk-titulo">###  — &lt;título&gt;</span></li><li class="wait"><span class="tk-estado">○</span>
+    <span class="tk-id">T-2</span><span class="tk-titulo">###  — &lt;título&gt;</span></li></ul>
+
+  <h2>Histórico de corridas</h2>
+  <table><thead><tr><th>Tarea</th><th>Modelo</th><th>Desenlace</th></tr></thead>
+  <tbody><tr><td colspan="3">sin corridas</td></tr></tbody></table>
+  <span class="fuente">fuente: docs/corridas/*.json</span>
+
+  <footer>
+    <p><strong>Siguiente:</strong> G1 — el usuario aprueba docs/03-DEFINICION.md (C-01..C-50) y el corte en etapas. Revisar el mockup en https://myinterviews-mockup.mkvs.workers.dev</p>
+    <p>actualizado 2026-10-10T11:07:31Z · 8194896</p>
+  </footer>
+</div>
+<script>
+  (() => {
+    const gen = "2026-10-10T11:07:31Z";
+    const el = document.getElementById('hace');
+    const caja = document.getElementById('frescura');
+    const t = Date.parse(gen);
+    if (!el || !isFinite(t)) { if (el) el.textContent = 'frescura desconocida'; return; }
+    const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+    el.textContent = min < 1 ? 'actualizado hace instantes' : 'actualizado hace ' + min + ' min';
+    caja.classList.add(min >= 60 ? 'rojo' : min >= 15 ? 'amb' : 'ok');
+  })();
+</script>
+</body>
+</html>
