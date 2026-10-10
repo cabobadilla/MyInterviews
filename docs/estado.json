@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · G1 aprobado y fase 4 (diseño) cerrada: 7 ADRs, matriz C-01..C-24, 5 tareas con sus contratos y 3 casos ocultos. Listo para despachar al Coder.",
+  "resumen": "Ciclo 1 · T-01 verificada de punta a punta (RED reproducido, sello intacto, mutación muerde). Fase 5 en curso: quedan T-02 a T-05.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Diseño (G2)",
-  "siguiente": "Despachar T-01 al Coder con tests primero, tras correr el canario de capacidad del modelo.",
+  "fase_actual": "Implementación (G3) — T-01 verificada",
+  "siguiente": "Despachar T-02 (sesión de un solo usuario) con tests primero.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0": {
@@ -25,8 +25,8 @@
       "rechazo": 0
     },
     "G3": {
-      "evaluado": 0,
-      "rechazo": 0
+      "evaluado": 2,
+      "rechazo": 2
     },
     "G4": {
       "evaluado": 0,
@@ -40,7 +40,7 @@
   "casos_ocultos": 3,
   "modelo": {
     "coder": "opencode-go/glm-5.3-flash",
-    "nota": "se valida con el canario de capacidad (preflight-model.sh) antes de despachar"
+    "nota": "canario de capacidad pasado (3/3) antes de despachar"
   },
   "mockup": {
     "url": "https://myinterviews-mockup.mkvs.workers.dev",
@@ -79,7 +79,7 @@
       "nombre": "3 · Definición",
       "estado": "completa",
       "gate": "G1",
-      "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; C-25..C-54 definidos para sus ciclos",
+      "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; el resto definido para sus ciclos",
       "puntos": [
         "03-DEFINICION.md"
       ]
@@ -100,18 +100,21 @@
     {
       "id": "impl",
       "nombre": "5 · Implementación y pruebas",
-      "estado": "pendiente",
+      "estado": "en curso",
       "gate": "G5",
-      "resumen": "",
-      "puntos": []
+      "resumen": "T-01 verificada. Faltan T-02, T-03, T-04 y T-05.",
+      "puntos": [
+        "tests/",
+        "src/"
+      ]
     }
   ],
   "tareas": [
     {
       "id": "T-01",
       "titulo": "Shell: Worker con Hono + SPA que carga",
-      "estado": "pendiente",
-      "nota": "C-01, C-07, C-14, C-18"
+      "estado": "verificada",
+      "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01"
     },
     {
       "id": "T-03",
@@ -197,7 +200,7 @@
   "decisiones": [
     {
       "id": "ADR-001",
-      "texto": "Un solo Worker con `main` + `assets` en vez de Pages + Worker: un origen, sin CORS, un deploy (desvía del spec §3.1, declarado)."
+      "texto": "Un solo Worker con `main` + `assets` en vez de Pages + Worker: un origen, sin CORS, un deploy (desvía del spec §3.1, declarado). `assets` va en forma de objeto: la de string la rechaza Wrangler 4."
     },
     {
       "id": "ADR-002",
@@ -209,11 +212,19 @@
     },
     {
       "id": "ADR-004",
-      "texto": "La suite y los ocultos corren contra `wrangler dev` real con D1 local, no contra mocks."
+      "texto": "La suite y los ocultos corren contra `wrangler dev` real con D1 local, no contra mocks. La suite visible corre con cero infraestructura; la API se verifica en el smoke."
     },
     {
       "id": "ADR-005",
-      "texto": "Los criterios de forma se miden sobre un fixture que monta los componentes reales con datos fijos."
+      "texto": "Los criterios de `existencia` y de `forma` se miden sobre fixtures que montan los componentes reales: en una SPA el DOM no existe hasta que corre el JS."
+    },
+    {
+      "id": "ADR-006",
+      "texto": "Extracción con prompt + validación Zod + un reintento; el modelo sale de una variable, nunca de una constante."
+    },
+    {
+      "id": "ADR-007",
+      "texto": "El límite de intentos del login vive en D1 (`login_attempts`, clave por IP): el spec lo pide en §2.1 y su §3.3 no traía dónde contarlo."
     },
     {
       "id": "Q2",
@@ -232,6 +243,11 @@
       "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)."
     }
   ],
+  "lecciones_de_la_corrida": [
+    "El RED de T-01 vino inválido DOS veces: primero los casos fallaban por excepción en vez de por aserción, después el commit de tests quedó posterior al de implementación y ya no existía en git ningún estado «tests sin implementación» — la suite pasaba en el único commit donde la guardia podía medir. Se reconstruyó la historia en orden (100% del trabajo del Coder preservado en la rama coder-t01).",
+    "El test EXTRA de /api/health salió de la suite visible: importaba el Worker y necesita node_modules, y la guardia corre la suite en un árbol pelado, así que fallaba por error y no por aserción. La API se verifica en el smoke HTTP contra la URL.",
+    "Dos huecos de diseño propios, encontrados por el Coder: `login_attempts` no existía en el spec §3.3 (ahora en ADR-007) y `assets` va en forma de objeto según Wrangler 4 (corregido en ADR-001 y en el contrato)."
+  ],
   "diferido": [
     "Ciclo 2 — perfil, importación desde .md y biblioteca de experiencia",
     "Ciclo 2 — CV y carta: agente que propone selección y prioridad de experiencias, versionado, edición manual y export a PDF",
@@ -239,14 +255,14 @@
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-10T16:07:14Z",
-  "commit_sha": "f61a964",
+  "generado_en": "2026-10-10T19:24:36Z",
+  "commit_sha": "52321bb",
   "mecanica": {
     "criterios": [
       {
         "id": "C-01",
         "clase": "—",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -282,7 +298,7 @@
       {
         "id": "C-07",
         "clase": "existencia",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -324,7 +340,7 @@
       {
         "id": "C-14",
         "clase": "existencia",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -348,7 +364,7 @@
       {
         "id": "C-18",
         "clase": "existencia",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -389,8 +405,8 @@
       }
     ],
     "integridad": {
-      "sello": "sin sello",
-      "red": "tests-finales vs implementación previa",
+      "sello": "intacto",
+      "red": "verify-red",
       "mutacion": "sin dato",
       "arbol_limpio": false
     },
@@ -407,8 +423,5 @@
       "corre": true,
       "verde": true
     }
-  },
-  "tablero": {
-    "url": "https://myinterviews-tablero.mkvs.workers.dev"
   }
 }

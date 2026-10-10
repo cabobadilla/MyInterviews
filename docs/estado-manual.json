@@ -1,23 +1,23 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · G1 aprobado y fase 4 (diseño) cerrada: 7 ADRs, matriz C-01..C-24, 5 tareas con sus contratos y 3 casos ocultos. Listo para despachar al Coder.",
+  "resumen": "Ciclo 1 · T-01 verificada de punta a punta (RED reproducido, sello intacto, mutación muerde). Fase 5 en curso: quedan T-02 a T-05.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Diseño (G2)",
-  "siguiente": "Despachar T-01 al Coder con tests primero, tras correr el canario de capacidad del modelo.",
+  "fase_actual": "Implementación (G3) — T-01 verificada",
+  "siguiente": "Despachar T-02 (sesión de un solo usuario) con tests primero.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
     "G1a": { "evaluado": 1, "rechazo": 0 },
     "G1":  { "evaluado": 2, "rechazo": 1 },
     "G2":  { "evaluado": 1, "rechazo": 0 },
-    "G3":  { "evaluado": 0, "rechazo": 0 },
+    "G3":  { "evaluado": 2, "rechazo": 2 },
     "G4":  { "evaluado": 0, "rechazo": 0 },
     "G5":  { "evaluado": 0, "rechazo": 0 }
   },
   "casos_ocultos": 3,
-  "modelo": { "coder": "opencode-go/glm-5.3-flash", "nota": "se valida con el canario de capacidad (preflight-model.sh) antes de despachar" },
+  "modelo": { "coder": "opencode-go/glm-5.3-flash", "nota": "canario de capacidad pasado (3/3) antes de despachar" },
   "mockup": {
     "url": "https://myinterviews-mockup.mkvs.workers.dev",
     "estado": "congelado, con la marca de ciclo (C1/C2/C3) por pantalla",
@@ -32,12 +32,12 @@
   "fases": [
     { "id": "idea",     "nombre": "1 · Idea",                     "estado": "completa",  "gate": "G0",  "resumen": "Spec v3 verbatim + las 3 preguntas con supuesto del PO", "puntos": ["01-IDEA.md"] },
     { "id": "analisis", "nombre": "2 · Análisis",                 "estado": "completa",  "gate": "G1a", "resumen": "12 dudas resueltas, 3 huecos de esquema encontrados, corte en 3 ciclos fijado por el usuario", "puntos": ["02-ANALISIS.md"] },
-    { "id": "def",      "nombre": "3 · Definición",               "estado": "completa",  "gate": "G1",  "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; C-25..C-54 definidos para sus ciclos", "puntos": ["03-DEFINICION.md"] },
+    { "id": "def",      "nombre": "3 · Definición",               "estado": "completa",  "gate": "G1",  "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; el resto definido para sus ciclos", "puntos": ["03-DEFINICION.md"] },
     { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "completa",  "gate": "G2",  "resumen": "7 ADRs, matriz C-01..C-24, 5 tareas con contratos, 3 casos ocultos", "puntos": ["04-DISENO.md", "05-TAREAS.md", "ADR-001..007", "contratos/"] },
-    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "pendiente", "gate": "G5",  "resumen": "", "puntos": [] }
+    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "en curso",  "gate": "G5",  "resumen": "T-01 verificada. Faltan T-02, T-03, T-04 y T-05.", "puntos": ["tests/", "src/"] }
   ],
   "tareas": [
-    { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "pendiente", "nota": "C-01, C-07, C-14, C-18" },
+    { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "verificada", "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01" },
     { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "pendiente", "nota": "C-02..C-06" },
     { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "pendiente", "nota": "C-08..C-13" },
     { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
@@ -55,15 +55,22 @@
     { "id": "HU-9", "titulo": "Cierre con aprendizajes",             "ciclo": "C3", "criterios": 6 }
   ],
   "decisiones": [
-    { "id": "ADR-001", "texto": "Un solo Worker con `main` + `assets` en vez de Pages + Worker: un origen, sin CORS, un deploy (desvía del spec §3.1, declarado)." },
+    { "id": "ADR-001", "texto": "Un solo Worker con `main` + `assets` en vez de Pages + Worker: un origen, sin CORS, un deploy (desvía del spec §3.1, declarado). `assets` va en forma de objeto: la de string la rechaza Wrangler 4." },
     { "id": "ADR-002", "texto": "npm y un solo paquete, no pnpm + monorepo: pnpm no está instalado y el monorepo no resuelve nada de este ciclo." },
     { "id": "ADR-003", "texto": "Una sola migración con el esquema completo del spec ya corregido (`status_previo`, `idx_docs_actual` UNIQUE)." },
-    { "id": "ADR-004", "texto": "La suite y los ocultos corren contra `wrangler dev` real con D1 local, no contra mocks." },
-    { "id": "ADR-005", "texto": "Los criterios de forma se miden sobre un fixture que monta los componentes reales con datos fijos." },
+    { "id": "ADR-004", "texto": "La suite y los ocultos corren contra `wrangler dev` real con D1 local, no contra mocks. La suite visible corre con cero infraestructura; la API se verifica en el smoke." },
+    { "id": "ADR-005", "texto": "Los criterios de `existencia` y de `forma` se miden sobre fixtures que montan los componentes reales: en una SPA el DOM no existe hasta que corre el JS." },
+    { "id": "ADR-006", "texto": "Extracción con prompt + validación Zod + un reintento; el modelo sale de una variable, nunca de una constante." },
+    { "id": "ADR-007", "texto": "El límite de intentos del login vive en D1 (`login_attempts`, clave por IP): el spec lo pide en §2.1 y su §3.3 no traía dónde contarlo." },
     { "id": "Q2", "texto": "Se agrega `status_previo` a applications: el spec pide «reabrir al estado previo» y el esquema no tenía dónde guardarlo." },
     { "id": "Q3", "texto": "`idx_docs_actual` pasa a índice parcial ÚNICO: con el índice no único podían coexistir dos versiones «vigentes»." },
     { "id": "Q11", "texto": "El CV lo propone un agente (Ciclo 2): el usuario acepta, saca o reordena; nunca decide el agente." },
     { "id": "Q12", "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)." }
+  ],
+  "lecciones_de_la_corrida": [
+    "El RED de T-01 vino inválido DOS veces: primero los casos fallaban por excepción en vez de por aserción, después el commit de tests quedó posterior al de implementación y ya no existía en git ningún estado «tests sin implementación» — la suite pasaba en el único commit donde la guardia podía medir. Se reconstruyó la historia en orden (100% del trabajo del Coder preservado en la rama coder-t01).",
+    "El test EXTRA de /api/health salió de la suite visible: importaba el Worker y necesita node_modules, y la guardia corre la suite en un árbol pelado, así que fallaba por error y no por aserción. La API se verifica en el smoke HTTP contra la URL.",
+    "Dos huecos de diseño propios, encontrados por el Coder: `login_attempts` no existía en el spec §3.3 (ahora en ADR-007) y `assets` va en forma de objeto según Wrangler 4 (corregido en ADR-001 y en el contrato)."
   ],
   "diferido": [
     "Ciclo 2 — perfil, importación desde .md y biblioteca de experiencia",

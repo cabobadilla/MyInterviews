@@ -92,7 +92,7 @@ T-01 → T-02 → T-03 → { T-04, T-05 }
 
 | Tarea | Estado | Gate G3 (tests primero) | Notas |
 |---|---|---|---|
-| T-01 | pendiente | — | — |
+| T-01 | **completa** | RED válido | reproducido en `99eaad7` por `verify-red`; sello `seal-from-commit` intacto; mutar `id="login"` pone rojo **solo** C-01 |
 | T-02 | pendiente | — | — |
 | T-03 | pendiente | — | — |
 | T-04 | pendiente | — | — |
