@@ -1,7 +1,7 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01 verificada de punta a punta (RED reproducido, sello intacto, mutación muerde). Fase 5 en curso: quedan T-02 a T-05.",
+  "resumen": "Ciclo 1 · T-01 verificada (RED reproducido, sello intacto, mutación muerde). G3: dos corridas rechazadas por RED inválido antes de esta. Fase 5 en curso: quedan T-02 a T-05.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
   "fase_actual": "Implementación (G3) — T-01 verificada",
@@ -113,7 +113,7 @@
     {
       "id": "T-01",
       "titulo": "Shell: Worker con Hono + SPA que carga",
-      "estado": "verificada",
+      "estado": "listo",
       "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01"
     },
     {
@@ -243,20 +243,15 @@
       "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)."
     }
   ],
-  "lecciones_de_la_corrida": [
-    "El RED de T-01 vino inválido DOS veces: primero los casos fallaban por excepción en vez de por aserción, después el commit de tests quedó posterior al de implementación y ya no existía en git ningún estado «tests sin implementación» — la suite pasaba en el único commit donde la guardia podía medir. Se reconstruyó la historia en orden (100% del trabajo del Coder preservado en la rama coder-t01).",
-    "El test EXTRA de /api/health salió de la suite visible: importaba el Worker y necesita node_modules, y la guardia corre la suite en un árbol pelado, así que fallaba por error y no por aserción. La API se verifica en el smoke HTTP contra la URL.",
-    "Dos huecos de diseño propios, encontrados por el Coder: `login_attempts` no existía en el spec §3.3 (ahora en ADR-007) y `assets` va en forma de objeto según Wrangler 4 (corregido en ADR-001 y en el contrato)."
-  ],
-  "diferido": [
+  "siguientes_ciclos": [
     "Ciclo 2 — perfil, importación desde .md y biblioteca de experiencia",
     "Ciclo 2 — CV y carta: agente que propone selección y prioridad de experiencias, versionado, edición manual y export a PDF",
     "Ciclo 3 — entrevistas 1..N y brief a partir de los datos del entrevistador",
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-10T19:24:36Z",
-  "commit_sha": "52321bb",
+  "generado_en": "2026-10-10T21:28:38Z",
+  "commit_sha": "4a430bc",
   "mecanica": {
     "criterios": [
       {
@@ -423,5 +418,8 @@
       "corre": true,
       "verde": true
     }
+  },
+  "tablero": {
+    "url": "https://myinterviews-tablero.mkvs.workers.dev"
   }
 }

@@ -41,14 +41,14 @@
   <header class="top">
     <div class="sub">Tablero de avance · proceso idea → pruebas</div>
     <h1>MyInterviews</h1>
-    <p class="sub">Ciclo 1 · G1 aprobado y fase 4 (diseño) cerrada: 7 ADRs, matriz C-01..C-24, 5 tareas con sus contratos y 3 casos ocultos. Listo para despachar al Coder.</p>
+    <p class="sub">Ciclo 1 · T-01 verificada (RED reproducido, sello intacto, mutación muerde). G3: dos corridas rechazadas por RED inválido antes de esta. Fase 5 en curso: quedan T-02 a T-05.</p>
     <div class="kpis">
-      <div class="kpi"><b>0%</b><span>Tareas</span></div>
-      <div class="kpi"><b>0/5</b><span>Completadas</span></div>
+      <div class="kpi"><b>20%</b><span>Tareas</span></div>
+      <div class="kpi"><b>1/5</b><span>Completadas</span></div>
       <div class="kpi"><b>Ciclo 1</b><span>Ciclo</span></div>
       <div class="kpi"><b>producto</b><span>Perfil</span></div>
     </div>
-    <p class="frescura" id="frescura">generado_en 2026-10-10T16:07:14Z · commit_sha f61a964
+    <p class="frescura" id="frescura">generado_en 2026-10-10T21:28:38Z · commit_sha 4a430bc
       · <span id="hace">calculando…</span></p>
   </header>
 
@@ -57,7 +57,7 @@
   <table><thead><tr><th>ID</th><th>Clase</th><th>Cobertura</th><th>Oculto</th></tr></thead>
   <tbody><tr>
     <td><code>C-01</code></td><td>—</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-02</code></td><td>comportamiento</td>
     <td>✗ sin test</td>
@@ -75,7 +75,7 @@
     <td>✗ sin test</td>
     <td>—</td></tr><tr>
     <td><code>C-07</code></td><td>existencia</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-08</code></td><td>comportamiento</td>
     <td>✗ sin test</td>
@@ -96,7 +96,7 @@
     <td>✗ sin test</td>
     <td>—</td></tr><tr>
     <td><code>C-14</code></td><td>existencia</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-15</code></td><td>comportamiento</td>
     <td>✗ sin test</td>
@@ -108,7 +108,7 @@
     <td>✗ sin test</td>
     <td>—</td></tr><tr>
     <td><code>C-18</code></td><td>existencia</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-19</code></td><td>comportamiento</td>
     <td>✗ sin test</td>
@@ -132,13 +132,13 @@
 
   <h2>B · Integridad por tarea</h2>
   <div class="caja">
-    <p>Sello: <span class="chip">sin sello</span> · RED: tests-finales vs implementación previa · mutación: sin dato · árbol: sucio</p>
+    <p>Sello: <span class="chip">intacto</span> · RED: verify-red · mutación: sin dato · árbol: sucio</p>
   </div>
   <span class="fuente">fuente: freeze-tests.sh verify · git status --porcelain · docs/06-QA-REPORT.md</span>
 
   <h2>C · Gates</h2>
   <table><thead><tr><th>Gate</th><th class="num">Evaluado</th><th class="num">Rechazó</th><th class="num">Tasa</th></tr></thead>
-  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
+  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">2</td><td class="num">2</td><td class="num">100%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
   <span class="fuente">fuente: estado.json → gates (lo escribe review.sh)</span>
 
   <h2>D · Costo</h2>
@@ -155,7 +155,7 @@
   <span class="fuente">fuente: estado.json → despliegue (lo escribe deploy.sh) · mockup</span>
 
   <h2>Tareas del ciclo</h2>
-  <ul class="lista"><li class="wait"><span class="tk-estado">○</span>
+  <ul class="lista"><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-01</span><span class="tk-titulo">Shell: Worker con Hono + SPA que carga</span></li><li class="wait"><span class="tk-estado">○</span>
     <span class="tk-id">T-03</span><span class="tk-titulo">Cargar oferta y extraer con LLM</span></li><li class="wait"><span class="tk-estado">○</span>
     <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="wait"><span class="tk-estado">○</span>
@@ -168,13 +168,13 @@
   <span class="fuente">fuente: docs/corridas/*.json</span>
 
   <footer>
-    <p><strong>Siguiente:</strong> Despachar T-01 al Coder con tests primero, tras correr el canario de capacidad del modelo.</p>
-    <p>actualizado 2026-10-10T16:07:14Z · f61a964</p>
+    <p><strong>Siguiente:</strong> Despachar T-02 (sesión de un solo usuario) con tests primero.</p>
+    <p>actualizado 2026-10-10T21:28:38Z · 4a430bc</p>
   </footer>
 </div>
 <script>
   (() => {
-    const gen = "2026-10-10T16:07:14Z";
+    const gen = "2026-10-10T21:28:38Z";
     const el = document.getElementById('hace');
     const caja = document.getElementById('frescura');
     const t = Date.parse(gen);
