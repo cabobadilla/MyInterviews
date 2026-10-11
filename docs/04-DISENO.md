@@ -240,6 +240,10 @@ assets. El valor de `APP_PASSWORD_HASH` se genera **fuera** del entorno del Code
 | `C-02` | `/api/*` sin cookie | C-02 | comportamiento | `GET /api/offers` sin cookie → `401`; **0** consultas D1 |
 | `C-02` | `GET /api/session`, la excepción | C-02 | comportamiento | sin cookie → `200 {autenticado:false}`; con cookie válida → `200 {autenticado:true}` |
 | `C-05` | logout invalida de verdad | C-05 | comportamiento | tras el logout, una ruta protegida con **esa misma cookie** → `401` (ADR-009: hace falta estado) |
+| `C-01` | la app elige la vista al arrancar | C-01 | comportamiento | `GET /api/session` → `{autenticado:false}` muestra `#login` y **no** `#pipeline`; `{autenticado:true}` al revés |
+| `C-01` | login exitoso entra a la app | C-01 | comportamiento | tras un `200` del login, se ve `#pipeline` y **no** `#login`, sin recargar |
+| `C-03` | el error se ve | C-03 | comportamiento | tras un `401`, el mensaje genérico está **en pantalla** y el formulario **no** queda inerte |
+| `C-05` | el logout vuelve al login | C-05 | comportamiento | tras el `200` del logout, se ve `#login` |
 | `C-03` | Login falla, error genérico | C-03 | comportamiento | email inexistente y contraseña mala → **mismo status y mismo cuerpo** |
 | `C-04` | 6º intento bloqueado | C-04 | comportamiento | 5 fallos → 6º responde `429` **sin verificar la contraseña** |
 | `C-05` | Cookie de sesión y logout | C-05 | comportamiento | `Set-Cookie` con `HttpOnly`, `Secure`, `SameSite=Strict`; tras logout la cookie vieja → `401` |

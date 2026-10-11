@@ -34,8 +34,15 @@
 **Como** dueño de mis datos **quiero** entrar con mi propia credencial y que nadie más
 pueda **para** publicar la app en una URL sin exponerla.
 
-- **C-01** · `existencia` · `· C1`
-  CUANDO un visitante abre la app sin sesión EL SISTEMA DEBE mostrar el formulario `#login`
+- **C-01** · `comportamiento` · `· C1`
+  CUANDO la app arranca EL SISTEMA DEBE preguntar `GET /api/session` y mostrar **una sola** de las
+  dos vistas: el formulario `#login` si el estado es `{autenticado:false}`, o el contenedor
+  `#pipeline` si es `{autenticado:true}` — **sin recargar la página**.
+  **Se reclasifica de `existencia` a `comportamiento`.** El texto siempre describió una decisión
+  («abre la app sin sesión → muestra login»), pero la clase `existencia` ordenaba verificar algo
+  más débil: que el elemento **esté** en un fixture. Con esa clase, el test comprueba que el
+  formulario existe y **nunca** que la app elija la vista — y la app puede quedarse en el login
+  para siempre con la suite en verde. La clase no es una etiqueta: es la instrucción de qué medir.
 - **C-02** · `comportamiento` · `· C1` · `[ACC-13]`
   SI se pide cualquier `/api/*` distinto de `POST /api/auth/login` sin sesión válida
   ENTONCES EL SISTEMA DEBE responder `401` y NO DEBE ejecutar ninguna consulta contra D1
@@ -45,13 +52,15 @@ pueda **para** publicar la app en una URL sin exponerla.
   de «no puedo preguntar», que son cosas distintas.
 - **C-03** · `comportamiento` · `· C1` · `[ACC-13]`
   CUANDO el login falla EL SISTEMA DEBE responder un error **genérico**, sin revelar si
-  el email existe ni distinguirlo de una contraseña incorrecta
+  el email existe ni distinguirlo de una contraseña incorrecta, **y DEBE mostrarlo en la
+  pantalla**: un formulario que no dice nada deja al usuario sin saber si el request salió.
 - **C-04** · `comportamiento` · `· C1` · `[ACC-14]`
   CUANDO ocurren 5 intentos fallidos desde la misma IP en 15 minutos EL SISTEMA DEBE
   rechazar el 6º intento con `429` **sin evaluar la contraseña**
 - **C-05** · `comportamiento` · `· C1`
   CUANDO el login es correcto EL SISTEMA DEBE emitir una cookie `HttpOnly; Secure;
   SameSite=Strict`, y `POST /api/auth/logout` DEBE invalidar esa sesión
+  CUANDO el logout responde `200` EL SISTEMA DEBE volver a la vista de login **sin recargar**.
   **«Invalidar» significa que el servidor DEJA DE ACEPTARLA**, no que le pide al navegador que
   la borre: con esa misma cookie, una ruta protegida DEBE responder `401`. Borrar la cookie es
   el efecto visible, no el criterio — si la cookie se copió, borrarla no la invalida (ADR-009).

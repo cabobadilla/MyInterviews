@@ -3,7 +3,7 @@
 - **Proyecto:** MyInterviews
 - **Fecha:** 2026-10-10
 - **Entrada:** `docs/04-DISENO.md` (matriz C-01..C-24) + `docs/03-DEFINICION.md`
-- **Contratos:** `docs/contratos/T-01.md` … `docs/contratos/T-05.md` — **el contrato es lo
+- **Contratos:** `docs/contratos/T-01.md` … `docs/contratos/T-06.md` — **el contrato es lo
   que se le pasa al Coder**, no esta lista completa.
 
 ## Reglas
@@ -25,8 +25,13 @@
 sin sesión no hay nada que probar. `T-03` precede a `T-04` (sin oferta no hay detalle) y a
 `T-05` (sin ofertas no hay pipeline con datos).
 
+`T-06` va al final y **no** depende del contenido de las demás: cablea la SPA contra la API que
+ya existe. Se agrega tarde porque el hueco apareció **probando la app publicada**, no leyendo el
+código: con C-01 clasificado como `existencia`, la suite verificaba que el formulario existiera y
+nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde.
+
 ```
-T-01 → T-02 → T-03 → { T-04, T-05 }
+T-01 → T-02 → T-03 → { T-04, T-05 } → T-06
 ```
 
 ## Tareas
@@ -86,6 +91,22 @@ T-01 → T-02 → T-03 → { T-04, T-05 }
   número; crear una oferta la muestra **sin reload**
 - **Criterio de terminado:** los 6 casos en verde, incluidos los 3 de `forma` medidos
 
+### T-06 — La SPA contra la API: arranque, transición y error en pantalla
+
+- **Cubre:** C-01 (reclasificado a `comportamiento`), C-03, C-05
+- **Casos que debe cubrir:** `C-01`, `C-03` (los nuevos observables) — los sellados `C-01` de T-01 quedan como están
+- **Entrada:** T-01..T-05. La API ya responde; lo que falta es del lado de la SPA
+- **Salida:** la SPA pregunta `GET /api/session` al arrancar y elige vista; el login exitoso entra a
+  la app sin recargar; el error de login se ve en pantalla; el logout vuelve al login
+- **Test primero:** con la API **inyectada como doble** (no se pega a la red: la suite corre en árbol
+  pelado), la vista mostrada depende de `{autenticado}`; el `200` del login cambia la vista; el `401`
+  deja el mensaje genérico en pantalla
+- **Criterio de terminado:** los observables nuevos en verde y los **18** sellados siguen verdes
+- **Por qué existe:** apareció probando la app publicada, no leyendo código. Con C-01 como
+  `existencia` la suite medía que el formulario existiera, nunca que la app eligiera la vista: el
+  login podía quedar inerte con todo en verde. Un criterio mal clasificado es un criterio que no se
+  verifica.
+
 ---
 
 ## Estado
@@ -93,9 +114,11 @@ T-01 → T-02 → T-03 → { T-04, T-05 }
 | Tarea | Estado | Gate G3 (tests primero) | Notas |
 |---|---|---|---|
 | T-01 | **completa** | RED válido | reproducido en `99eaad7` por `verify-red`; sello `seal-from-commit` intacto; mutar `id="login"` pone rojo **solo** C-01 |
-| T-02 | pendiente | — | — |
-| T-03 | pendiente | — | — |
+| T-02 | **completa** | RED válido | cinco defectos que solo el runtime mostraba; el último, `{results}` de D1 leído como fila; smoke del edge en 14/21 |
+| T-03 | **en curso** | — | cargar oferta y extraer con LLM (C-08..C-13) |
 | T-04 | pendiente | — | — |
+| T-05 | pendiente | — | — |
+| T-06 | pendiente | — | la SPA contra la API: hueco encontrado probando la app publicada |
 | T-05 | pendiente | — | — |
 
 ---
