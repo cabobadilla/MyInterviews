@@ -8,6 +8,7 @@ import { VENTANA_SEG } from './lib/rate_limit.js';
 import { esPublica } from './lib/rutas_publicas.js';
 import { respuestaSesion, respuestaSesionActiva } from './lib/respuesta_sesion.js';
 import { respuestaDeLogin, respuestaDeLogout, consultarIntentos, registrarIntento } from './routes/auth.js';
+import { respuestaDeExtract, respuestaDeListado } from './routes/offers.js';
 import { estaRevocadoDesdeDb } from './lib/revocacion.js';
 
 const app = new Hono();
@@ -93,6 +94,31 @@ app.post('/api/auth/logout', async (c) => {
     db: c.env?.DB,
   });
   if (r.borrarCookie) c.header('Set-Cookie', borrarSesion());
+  return c.json(r.body, r.status);
+});
+
+// T-03 — POST /api/offers/extract y GET /api/offers: la decisión vive en el
+// decisor de routes/offers.js; acá solo se pasa la forma del request. La red
+// del LLM viaja por globalThis.fetch (la del runtime del Worker).
+app.post('/api/offers/extract', async (c) => {
+  let body;
+  try {
+    body = await c.req.json();
+  } catch {
+    body = {};
+  }
+  const r = await respuestaDeExtract({
+    body,
+    env: c.env,
+    db: c.env?.DB,
+    fetchImpl: globalThis.fetch,
+    ahoraIso: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  });
+  return c.json(r.body, r.status);
+});
+
+app.get('/api/offers', async (c) => {
+  const r = await respuestaDeListado({ db: c.env?.DB });
   return c.json(r.body, r.status);
 });
 
