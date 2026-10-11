@@ -1,1 +1,0 @@
-import{n as e,t}from"./styles-Bt0HBIeN.js";import{t as n}from"./Pipeline-Bm0vqGTM.js";import{t as r}from"./server.browser-5f1B5PX3.js";var i=r(),a=e(),o=t(),s=document.getElementById(`root`);s&&(s.innerHTML=(0,i.renderToString)((0,o.jsx)(n,{})),(0,a.hydrateRoot)(s,(0,o.jsx)(n,{})));

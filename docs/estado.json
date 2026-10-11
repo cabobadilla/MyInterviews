@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01, T-02 y T-03 verificadas y publicadas: el smoke del edge da 19/23 y la extracción con el modelo real funciona en producción. Probando la app publicada apareció un hueco que la suite no podía ver —el login queda inerte porque nada en la SPA decide la vista—: entra T-06, y el smoke suma un chequeo con navegador contra la URL publicada.",
+  "resumen": "Ciclo 1 · T-01, T-02, T-03 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 19/23 (los 4 rojos son rutas de T-04 y T-05) y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01, T-02 y T-03 verificadas; T-06 en curso",
-  "siguiente": "T-06 en curso (la SPA contra la API: arranque, transición y error) → T-04 y T-05 → cierre con casos ocultos, informe y deploy. Smokes restantes: los checks 17 y 20 son T-04; 18 y 19 son T-05.",
+  "fase_actual": "Implementación (G3) — T-01, T-02, T-03 y T-06 verificadas; faltan T-04 y T-05",
+  "siguiente": "T-04 (revisar y editar la oferta: pone en verde los checks 17 y 20) y T-05 (pipeline y contadores: los checks 18 y 19). Después el cierre: casos ocultos contra wrangler dev, informe de QA y la promoción de los chequeos del smoke a criterios numerados.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0": {
@@ -105,7 +105,7 @@
       "nombre": "5 · Implementación y pruebas",
       "estado": "en curso",
       "gate": "G5",
-      "resumen": "T-01, T-02 y T-03 verificadas; el smoke da 19/23 contra el edge. Faltan T-04, T-05 y T-06.",
+      "resumen": "T-01, T-02, T-03 y T-06 verificadas; el smoke HTTP da 19/23 y el de interfaz 7/7 contra el edge. Faltan T-04 y T-05.",
       "puntos": [
         "tests/",
         "src/"
@@ -134,8 +134,8 @@
     {
       "id": "T-06",
       "titulo": "La SPA contra la API (arranque, transición y error)",
-      "estado": "en-curso",
-      "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. Incluye la costura para inyectar la API: sin ella la app no se puede montar con un doble y el defecto vuelve a ser invisible."
+      "estado": "listo",
+      "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. El Coder murió justo antes de commitear (intentó escribir fuera del proyecto): Hermes verificó y commiteó declarando autoría — 36/36 en árbol pelado. Dos correcciones de Hermes: el botón de salida estaba como #salir y el contrato fija #logout-boton (los ids existen para que el caso del fixture y el smoke de navegador miren lo mismo), y los fixtures se reconstruyeron (son artefactos compilados: sin rebuild medían la compilación anterior). RED válido en ac13df5, sello intacto con 9 archivos, y mutar el arranque para forzar login tumba C-01 y C-05. Smoke de interfaz contra el edge: 7/7."
     },
     {
       "id": "T-02",
@@ -267,8 +267,8 @@
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-11T16:03:34Z",
-  "commit_sha": "cc1f26b",
+  "generado_en": "2026-10-11T16:20:02Z",
+  "commit_sha": "6b4bb44",
   "mecanica": {
     "criterios": [
       {
@@ -417,10 +417,10 @@
       }
     ],
     "integridad": {
-      "sello": "cambiado",
-      "red": "tests-finales vs implementación previa",
+      "sello": "intacto",
+      "red": "verify-red",
       "mutacion": "sin dato",
-      "arbol_limpio": false
+      "arbol_limpio": true
     },
     "costo": {
       "usd": 0,
@@ -433,7 +433,7 @@
     "historico": [],
     "suite": {
       "corre": true,
-      "verde": false
+      "verde": true
     }
   },
   "tablero": {

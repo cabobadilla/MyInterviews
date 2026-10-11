@@ -58,3 +58,35 @@ export async function listarOfertas(db, limite = 20) {
     created_at: f.created_at ?? null,
   }));
 }
+
+// T-04 — la fila individual de la oferta (detalle y edición in situ).
+export const SQL_OBTENER_OFERTA = `SELECT id, source_url, raw_text, extracted_json, extraction_status, extraction_error, campos_faltantes_json, titulo, empresa, created_at, updated_at FROM job_offers WHERE id = ?`;
+
+export const SQL_ACTUALIZAR_OFERTA = `UPDATE job_offers
+  SET source_url = ?, raw_text = ?, extracted_json = ?, extraction_status = ?, extraction_error = ?,
+      campos_faltantes_json = ?, titulo = ?, empresa = ?, updated_at = ?
+  WHERE id = ?`;
+
+export async function obtenerOferta(db, id) {
+  const r = await db.prepare(SQL_OBTENER_OFERTA).bind(id).all();
+  const filas = Array.isArray(r) ? r : (r?.results ?? []);
+  return filas.length > 0 ? filas[0] : null;
+}
+
+// Edición in situ: UNA fila, sin re-extracción y sin versionado. Devuelve la
+// fila tal como quedó, con updated_at en el momento de la edición.
+export async function actualizarOferta(db, id, datos, ahoraIso) {
+  await db.prepare(SQL_ACTUALIZAR_OFERTA).bind(
+    datos.source_url ?? null,
+    datos.raw_text,
+    datos.extracted_json ?? null,
+    datos.extraction_status,
+    datos.extraction_error ?? null,
+    datos.campos_faltantes_json ?? '[]',
+    datos.titulo ?? null,
+    datos.empresa ?? null,
+    ahoraIso,
+    id,
+  ).run();
+  return { id, ...datos, updated_at: ahoraIso };
+}

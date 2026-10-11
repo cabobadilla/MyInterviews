@@ -43,3 +43,25 @@ body{
   padding:8px 14px; font:inherit; font-weight:600; cursor:pointer;
 }
 .campo-valor{font-weight:600}
+
+/* T-04 — detalle de oferta: resalte de faltantes (clase verificable, no
+   estilo en línea), plegable del raw_text y el resto de la pantalla. */
+.campo-faltante{
+  background:#f6d7d7; border:1px solid #d87171; border-radius:4px;
+  padding:2px 6px; color:#7a2020;
+}
+.campo-faltante::after{content:" · falta en la extracción"; font-weight:400; color:#7a2020}
+.detalle-busqueda{display:flex; gap:8px; align-items:center; margin-bottom:var(--gap)}
+.detalle-busqueda input{width:120px}
+.detalle-busqueda label{color:var(--dim)}
+.detalle-estado{color:var(--dim); margin:0 0 var(--gap)}
+.estado{font-weight:700}
+.estado-exitosa{color:#2f7a3f}
+.estado-parcial{color:#a06b00}
+.estado-fallida{color:#a12b2b}
+.campo-entrada{margin-top:6px; width:100%; box-sizing:border-box}
+.detalle-acciones{margin:var(--gap) 0}
+.detalle-aviso{color:var(--dim)}
+.detalle-raw pre{white-space:pre-wrap; max-height:320px; overflow:auto; background:var(--bg, #f7f7f7); padding:8px; border-radius:6px; font-size:13px}
+.detalle-origen a{color:var(--accent, #1f5fd0); word-break:break-all}
+.detalle-error{color:#a12b2b}

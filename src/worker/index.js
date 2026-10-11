@@ -8,7 +8,7 @@ import { VENTANA_SEG } from './lib/rate_limit.js';
 import { esPublica } from './lib/rutas_publicas.js';
 import { respuestaSesion, respuestaSesionActiva } from './lib/respuesta_sesion.js';
 import { respuestaDeLogin, respuestaDeLogout, consultarIntentos, registrarIntento } from './routes/auth.js';
-import { respuestaDeExtract, respuestaDeListado } from './routes/offers.js';
+import { respuestaDeExtract, respuestaDeListado, respuestaDeDetalle, respuestaDeEdicion } from './routes/offers.js';
 import { estaRevocadoDesdeDb } from './lib/revocacion.js';
 
 const app = new Hono();
@@ -119,6 +119,29 @@ app.post('/api/offers/extract', async (c) => {
 
 app.get('/api/offers', async (c) => {
   const r = await respuestaDeListado({ db: c.env?.DB });
+  return c.json(r.body, r.status);
+});
+
+// T-04 — detalle y edición de la oferta: la decisión vive en los decisores;
+// el PUT edita la fila in situ y JAMÁS vuelve a llamar al LLM.
+app.get('/api/offers/:id', async (c) => {
+  const r = await respuestaDeDetalle({ db: c.env?.DB, id: c.req.param('id') });
+  return c.json(r.body, r.status);
+});
+
+app.put('/api/offers/:id', async (c) => {
+  let body;
+  try {
+    body = await c.req.json();
+  } catch {
+    body = null;
+  }
+  const r = await respuestaDeEdicion({
+    db: c.env?.DB,
+    id: c.req.param('id'),
+    body,
+    ahoraIso: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  });
   return c.json(r.body, r.status);
 });
 

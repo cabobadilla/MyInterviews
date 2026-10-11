@@ -41,14 +41,14 @@
   <header class="top">
     <div class="sub">Tablero de avance · proceso idea → pruebas</div>
     <h1>MyInterviews</h1>
-    <p class="sub">Ciclo 1 · T-01, T-02 y T-03 verificadas y publicadas: el smoke del edge da 19/23 y la extracción con el modelo real funciona en producción. Probando la app publicada apareció un hueco que la suite no podía ver —el login queda inerte porque nada en la SPA decide la vista—: entra T-06, y el smoke suma un chequeo con navegador contra la URL publicada.</p>
+    <p class="sub">Ciclo 1 · T-01, T-02, T-03 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 19/23 (los 4 rojos son rutas de T-04 y T-05) y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.</p>
     <div class="kpis">
-      <div class="kpi"><b>50%</b><span>Tareas</span></div>
-      <div class="kpi"><b>3/6</b><span>Completadas</span></div>
+      <div class="kpi"><b>67%</b><span>Tareas</span></div>
+      <div class="kpi"><b>4/6</b><span>Completadas</span></div>
       <div class="kpi"><b>Ciclo 1</b><span>Ciclo</span></div>
       <div class="kpi"><b>producto</b><span>Perfil</span></div>
     </div>
-    <p class="frescura" id="frescura">generado_en 2026-10-11T16:03:34Z · commit_sha cc1f26b
+    <p class="frescura" id="frescura">generado_en 2026-10-11T16:20:02Z · commit_sha 6b4bb44
       · <span id="hace">calculando…</span></p>
   </header>
 
@@ -132,7 +132,7 @@
 
   <h2>B · Integridad por tarea</h2>
   <div class="caja">
-    <p>Sello: <span class="chip">cambiado</span> · RED: tests-finales vs implementación previa · mutación: sin dato · árbol: sucio</p>
+    <p>Sello: <span class="chip">intacto</span> · RED: verify-red · mutación: sin dato · árbol: limpio</p>
   </div>
   <span class="fuente">fuente: freeze-tests.sh verify · git status --porcelain · docs/06-QA-REPORT.md</span>
 
@@ -158,7 +158,7 @@
   <ul class="lista"><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-01</span><span class="tk-titulo">Shell: Worker con Hono + SPA que carga</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-03</span><span class="tk-titulo">Cargar oferta y extraer con LLM</span></li><li class="wait"><span class="tk-estado">○</span>
-    <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="run"><span class="tk-estado">◐</span>
+    <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-06</span><span class="tk-titulo">La SPA contra la API (arranque, transición y error)</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-02</span><span class="tk-titulo">Sesión de un solo usuario</span></li><li class="wait"><span class="tk-estado">○</span>
     <span class="tk-id">T-04</span><span class="tk-titulo">Revisar y editar la oferta extraída</span></li></ul>
@@ -169,13 +169,13 @@
   <span class="fuente">fuente: docs/corridas/*.json</span>
 
   <footer>
-    <p><strong>Siguiente:</strong> T-06 en curso (la SPA contra la API: arranque, transición y error) → T-04 y T-05 → cierre con casos ocultos, informe y deploy. Smokes restantes: los checks 17 y 20 son T-04; 18 y 19 son T-05.</p>
-    <p>actualizado 2026-10-11T16:03:34Z · cc1f26b</p>
+    <p><strong>Siguiente:</strong> T-04 (revisar y editar la oferta: pone en verde los checks 17 y 20) y T-05 (pipeline y contadores: los checks 18 y 19). Después el cierre: casos ocultos contra wrangler dev, informe de QA y la promoción de los chequeos del smoke a criterios numerados.</p>
+    <p>actualizado 2026-10-11T16:20:02Z · 6b4bb44</p>
   </footer>
 </div>
 <script>
   (() => {
-    const gen = "2026-10-11T16:03:34Z";
+    const gen = "2026-10-11T16:20:02Z";
     const el = document.getElementById('hace');
     const caja = document.getElementById('frescura');
     const t = Date.parse(gen);
