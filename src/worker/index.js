@@ -4,13 +4,12 @@
 import { Hono } from 'hono';
 import { exigirSesion } from './middleware/auth.js';
 import { borrarSesion, leerCookie, serializarSesion } from './lib/cookie.js';
-import { verificar } from './lib/session.js';
 import { VENTANA_SEG } from './lib/rate_limit.js';
 import { esPublica } from './lib/rutas_publicas.js';
+import { respuestaSesion } from './lib/respuesta_sesion.js';
 import { respuestaDeLogin, consultarIntentos, registrarIntento } from './routes/auth.js';
 
 const app = new Hono();
-
 app.get('/api/health', (c) => c.json({ ok: true }));
 
 // Barrera de sesión: TODO /api/* salvo lo público (lista única en lib/rutas_publicas.js):
@@ -30,15 +29,19 @@ app.use('/api/*', async (c, next) => {
   return next();
 });
 
-// GET /api/session → los claims de la cookie, o 401 con la cookie borrada (C-06).
+// GET /api/session — C-02, la excepción: la ruta INFORMA estado, no bloquea.
+// SIEMPRE 200: {autenticado:true} con cookie válida, {autenticado:false} sin
+// ella (nunca 401: la SPA debe distinguir «no hay sesión» de «no puedo
+// preguntar»). La forma de la respuesta sale del cableado y pasa al decisor;
+// si la cookie es inválida/vencida se borra la vieja.
 app.get('/api/session', (c) => {
-  const secreto = c.env?.SESSION_SECRET;
-  const claims = verificar(leerCookie(c.req.header('Cookie') ?? ''), secreto, Math.floor(Date.now() / 1000));
-  if (!claims) {
-    c.header('Set-Cookie', borrarSesion());
-    return c.json({ error: 'sesión requerida' }, 401);
-  }
-  return c.json({ session: claims });
+  const r = respuestaSesion(
+    leerCookie(c.req.header('Cookie') ?? ''),
+    c.env?.SESSION_SECRET,
+    Math.floor(Date.now() / 1000),
+  );
+  if (r.borrarCookie) c.header('Set-Cookie', borrarSesion());
+  return c.json(r.cuerpo, r.status);
 });
 
 // POST /api/auth/login — C-03 (error genérico), C-04 (429 sin mirar la contraseña).
