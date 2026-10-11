@@ -1,8 +1,16 @@
 // lib/session.js — decisor de sesión. Imports: solo node:crypto (regla de
 // importabilidad, ADR-004). Sin hono, sin repositorios, sin estado.
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const TTL_SEG = 30 * 24 * 60 * 60; // C-06: vida máxima de 30 días
+
+// nuevoJti() → string — identificador de sesión ALEATORIO, distinto en cada
+// login (ADR-009). El login lo suma STANDALONE al payload que firma firmar:
+// firmar y verificar NO cambian de forma (claims que entran = claims que
+// vuelven), el identificador va DENTRO del contenido ya firmado.
+export function nuevoJti() {
+  return randomBytes(16).toString('base64url');
+}
 
 function b64url(buf) {
   return Buffer.from(buf).toString('base64url');

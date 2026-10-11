@@ -1,23 +1,25 @@
-✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (692.233584ms)
-✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (605.710875ms)
-✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (582.111667ms)
-✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (574.029833ms)
-✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.666084ms)
-✔ C-02b · /api/session es pública: el decisor de rutas la exceptúa (2.371167ms)
-✔ C-04b · el SQL de login_attempts ejecuta contra el esquema de las migraciones (11.90825ms)
-✔ C-02 · /api/session responde 200 {autenticado:false} sin cookie y {autenticado:true} con cookie válida (3.390292ms)
-✔ C-02b · el cableado de GET /api/session usa el decisor y nunca devuelve 401 (1.163583ms)
-✔ C-02 · /api/* sin cookie: el decisor devuelve 401 y no toca ninguna consulta (2.422167ms)
-✔ C-03 · login: email inexistente y contraseña mala dan exactamente el mismo status y el mismo cuerpo (67.447834ms)
-✔ C-04 · límite de intentos: 5 fallos en 15 min y el 6º intento da 429 sin evaluar la contraseña (20.483333ms)
-✔ C-05 · cookie de sesión con HttpOnly, Secure y SameSite=Strict; logout la invalida al borrarla (1.075583ms)
-✔ C-06 · firma inválida o cookie vencida a los 30 días: verificar rechaza y el decisor manda 401 con la cookie borrada (0.732959ms)
-✔ extra · PBKDF2_ITERATIONS leído de env: el mismo hash con otra iteración de env no verifica la contraseña (40.311458ms)
-ℹ tests 15
+✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (430.399708ms)
+✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (441.561417ms)
+✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (517.745458ms)
+✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (635.814084ms)
+✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.847666ms)
+✔ C-02b · /api/session es pública: el decisor de rutas la exceptúa (1.481625ms)
+✔ C-04b · el SQL de login_attempts ejecuta contra el esquema de las migraciones (4.910917ms)
+✔ C-02 · /api/session responde 200 {autenticado:false} sin cookie y {autenticado:true} con cookie válida (1.124ms)
+✔ C-02b · el cableado de GET /api/session usa el decisor y nunca devuelve 401 (0.407042ms)
+✔ C-05 · el logout revoca la sesión: con la misma cookie, la barrera responde 401 (8.18975ms)
+✔ C-05 · el SQL de sesiones_revocadas ejecuta contra el esquema de las migraciones (1.045709ms)
+✔ C-02 · /api/* sin cookie: el decisor devuelve 401 y no toca ninguna consulta (1.243083ms)
+✔ C-03 · login: email inexistente y contraseña mala dan exactamente el mismo status y el mismo cuerpo (26.0255ms)
+✔ C-04 · límite de intentos: 5 fallos en 15 min y el 6º intento da 429 sin evaluar la contraseña (8.265541ms)
+✔ C-05 · cookie de sesión con HttpOnly, Secure y SameSite=Strict; logout la invalida al borrarla (0.549167ms)
+✔ C-06 · firma inválida o cookie vencida a los 30 días: verificar rechaza y el decisor manda 401 con la cookie borrada (0.594292ms)
+✔ extra · PBKDF2_ITERATIONS leído de env: el mismo hash con otra iteración de env no verifica la contraseña (15.904208ms)
+ℹ tests 17
 ℹ suites 0
-ℹ pass 15
+ℹ pass 17
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2721.661209
+ℹ duration_ms 2140.809833

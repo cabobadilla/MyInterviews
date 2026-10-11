@@ -3,7 +3,8 @@
 // casos vive acá, no en el cableado de Hono.
 import { pbkdf2Sync, timingSafeEqual, createHash } from 'node:crypto';
 import { evaluar } from '../lib/rate_limit.js';
-import { firmar } from '../lib/session.js';
+import { firmar, nuevoJti, verificar } from '../lib/session.js';
+import { revocar } from '../lib/revocacion.js';
 
 const TTL_COOKIE_SEG = 30 * 24 * 60 * 60;
 
@@ -60,8 +61,30 @@ export async function respuestaDeLogin({ body, env, intentos, ahoraSeg }) {
 
   if (!entra) return { status: 401, body: CUERPO_CREDENCIAL_INVALIDA };
 
-  const token = firmar({ exp: ahoraSeg + TTL_COOKIE_SEG }, secreto);
+  // ADR-009: el payload firma un jti ALEATORIO, distinto en cada login. Es el
+  // único ancla que el logout tiene para invalidar la sesión en el servidor.
+  const token = firmar({ exp: ahoraSeg + TTL_COOKIE_SEG, jti: nuevoJti() }, secreto);
   return { status: 200, body: { ok: true, email: env.APP_EMAIL }, setCookie: token };
+}
+
+// ── logout (C-05, ADR-009): la revocación vive EN la tabla, no en la cookie ──
+
+// respuestaDeLogout({ cookie, secreto, ahoraSeg, db })
+//   → { status, body } — el logout INSERTA la revocación del jti (si la sesión
+// que llegó tiene jti y hay base) y SIEMPRE ordena borrar la cookie.
+export async function respuestaDeLogout({ cookie, secreto, ahoraSeg, db }) {
+  if (typeof cookie === 'string' && cookie.length > 0 && typeof secreto === 'string' && secreto.length > 0) {
+    const claims = verificar(cookie, secreto, ahoraSeg);
+    if (claims && claims.jti) {
+      try {
+        await revocar(db, claims.jti, claims.exp);
+      } catch {
+        // la cookie se borra igual: cerrarle la puerta al navegador nunca
+        // depende de la base; la revocación es la invalidación del reuso.
+      }
+    }
+  }
+  return { status: 200, body: { ok: true }, borrarCookie: true };
 }
 
 // ── capa fina de D1 (ADR-007): solo lee/escribe las filas que consume evaluar ─
