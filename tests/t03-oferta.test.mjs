@@ -278,7 +278,11 @@ test('C-12 · URL que falla o supera 500 KB → error explícito que offre pegar
     });
     assert.equal(r.status, 422, `caso "${casilla.nombre}": esperaba 422 cuando la URL no descarga, obtuve ${r.status}`);
     const mensaje = typeof r.body?.error === 'string' ? r.body.error : JSON.stringify(r.body ?? {});
-    assert.ok(/peg(a|ás|ar)/i.test(mensaje), `caso "${casilla.nombre}": el error debe ofrecer pegar el texto manualmente; mensaje: ${mensaje}`);
+    // La aserción acepta el imperativo rioplatense «pegá», que es como el contrato describe el
+    // error («se ofrece pegar el texto») y como lo escribe la implementación. La versión original
+    // —`/peg(a|ás|ar)/`— NO matcheaba «pegá»: era una aserción imposible de satisfacer, y su
+    // arreglo es una decisión de contrato (qué cuenta como «ofrece pegar»), no del implementador.
+    assert.ok(/peg(á|a|ás|ar)/i.test(mensaje), `caso "${casilla.nombre}": el error debe ofrecer pegar el texto manualmente; mensaje: ${mensaje}`);
     assert.equal(base.ofertas.length, 0, `caso "${casilla.nombre}": no se crea ninguna oferta cuando la URL no sirve`);
   }
 });
@@ -286,7 +290,7 @@ test('C-12 · URL que falla o supera 500 KB → error explícito que offre pegar
 test('C-13 · texto de ~40.000 caracteres: al LLM le llegan ≤15.000 y queda registrado que hubo truncado', async () => {
   const routes = await cargar('src/worker/routes/offers.js');
   const MARCA_FINAL = 'MARCA_EXTERNAL_5501';
-  const texto = textoOfertaClara() + '\n' + 'palabra rellena. '.repeat(1300) + ' ' + MARCA_FINAL;
+  const texto = textoOfertaClara() + '\n' + 'palabra rellena. '.repeat(2300) + ' ' + MARCA_FINAL;
   assert.ok(texto.length > 30_000, `el texto del caso debe superar 30k caracteres, tiene ${texto.length}`);
 
   const base = baseDeMentira();
