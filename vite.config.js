@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const FIXTURES = [
+  'tests/fixtures/app.html',
   'tests/fixtures/login.html',
   'tests/fixtures/pipeline.html',
   'tests/fixtures/nueva-oferta.html',

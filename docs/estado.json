@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01 y T-02 verificadas y publicadas. El smoke contra el edge da 14/21: todo el acceso y la sesión en verde; los 7 rojos son las rutas de T-03, T-04 y T-05, que no existen todavía.",
+  "resumen": "Ciclo 1 · T-01, T-02 y T-03 verificadas y publicadas: el smoke del edge da 19/23 y la extracción con el modelo real funciona en producción. Probando la app publicada apareció un hueco que la suite no podía ver —el login queda inerte porque nada en la SPA decide la vista—: entra T-06, y el smoke suma un chequeo con navegador contra la URL publicada.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01 y T-02 verificadas; despachando T-03",
-  "siguiente": "T-03 (cargar oferta y extraer con LLM): pone en verde los checks 14 a 17 del smoke. Después T-04, T-05, y el cierre con casos ocultos e informe.",
+  "fase_actual": "Implementación (G3) — T-01, T-02 y T-03 verificadas; T-06 en curso",
+  "siguiente": "T-06 en curso (la SPA contra la API: arranque, transición y error) → T-04 y T-05 → cierre con casos ocultos, informe y deploy. Smokes restantes: los checks 17 y 20 son T-04; 18 y 19 son T-05.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0": {
@@ -53,8 +53,8 @@
     "local": "npx wrangler dev --port 8787 con D1 local, sin cuenta ni credenciales",
     "url": "https://myinterviews-worker.mkvs.workers.dev",
     "d1": "myinterviews · cd72c351-2391-4565-9a1f-99a7fbe3f510 · esquema 0001..0004 aplicado en remoto · el entorno local se alineó a 100.000 iteraciones de PBKDF2 para que el smoke local refleje producción",
-    "secretos": "OPENROUTER_API_KEY · APP_EMAIL · APP_PASSWORD_HASH · PBKDF2_ITERATIONS · SESSION_SECRET (ninguno en el repo: es público)",
-    "cloud": "npx wrangler deploy — lo hace solo Hermes. Límite que puede romperlo: CPU por request contra PBKDF2 (login → Error 1102); mitigado con PBKDF2_ITERATIONS como variable"
+    "secretos": "OPENROUTER_API_KEY · LLM_MODEL_EXTRACCION · APP_EMAIL · APP_PASSWORD_HASH · PBKDF2_ITERATIONS · SESSION_SECRET (ninguno en el repo: es público). LLM_MODEL_EXTRACCION FALTABA: la extracción fallaba SOLO en producción mientras en local andaba (estaba en .dev.vars). Un ADR que exige «el valor sale de una variable» agrega un paso en el edge que es fácil olvidar: hay que inventariar cada variable que el código lee de env contra `wrangler secret list`.",
+    "cloud": "npx wrangler deploy — lo hace solo Hermes. Límite que puede romperlo: CPU por request contra PBKDF2 (login → Error 1102); mitigado con PBKDF2_ITERATIONS como variable. El smoke se corre DOS veces: primero contra wrangler dev local (atrapa errores de runtime sin gastar deploy) y después contra la URL. Se suma un chequeo con navegador contra la URL publicada — abre la app, se loguea de verdad y comprueba que aparece el pipeline: eso es lo que apreta el usuario, y el smoke de solo-HTTP no lo veía"
   },
   "fases": [
     {
@@ -105,7 +105,7 @@
       "nombre": "5 · Implementación y pruebas",
       "estado": "en curso",
       "gate": "G5",
-      "resumen": "T-01 y T-02 verificadas; el smoke da 14/21 contra el edge. Faltan T-03, T-04 y T-05.",
+      "resumen": "T-01, T-02 y T-03 verificadas; el smoke da 19/23 contra el edge. Faltan T-04, T-05 y T-06.",
       "puntos": [
         "tests/",
         "src/"
@@ -122,14 +122,20 @@
     {
       "id": "T-03",
       "titulo": "Cargar oferta y extraer con LLM",
-      "estado": "pendiente",
-      "nota": "C-08..C-13"
+      "estado": "listo",
+      "nota": "C-08..C-13 · el Coder reescribió la rama dejando la implementación ANTES de los tests, así que el RED no se podía reproducir: historia reconstruida por Hermes (su trabajo quedó en la rama coder-t03), RED válido en 37cd0da, sello intacto con 8 archivos, 31/31 en árbol pelado verificado en un clon, y mutar MAX_PROMPT_CARACTERES 15k→20k deja 30 pasando y cae solo C-13. Dos aserciones corregidas con su razón: la de C-12 era imposible de satisfacer (su regex no matcheaba «pegá») y la de C-13 se contradecía con su propio input."
     },
     {
       "id": "T-05",
       "titulo": "Pipeline",
       "estado": "pendiente",
-      "nota": "C-19..C-24"
+      "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma"
+    },
+    {
+      "id": "T-06",
+      "titulo": "La SPA contra la API (arranque, transición y error)",
+      "estado": "en-curso",
+      "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. Incluye la costura para inyectar la API: sin ella la app no se puede montar con un doble y el defecto vuelve a ser invisible."
     },
     {
       "id": "T-02",
@@ -261,8 +267,8 @@
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-11T13:02:22Z",
-  "commit_sha": "f730ac5",
+  "generado_en": "2026-10-11T16:03:34Z",
+  "commit_sha": "cc1f26b",
   "mecanica": {
     "criterios": [
       {
@@ -310,37 +316,37 @@
       {
         "id": "C-08",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-09",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-10",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-11",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-12",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-13",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -411,10 +417,10 @@
       }
     ],
     "integridad": {
-      "sello": "intacto",
-      "red": "verify-red",
+      "sello": "cambiado",
+      "red": "tests-finales vs implementación previa",
       "mutacion": "sin dato",
-      "arbol_limpio": true
+      "arbol_limpio": false
     },
     "costo": {
       "usd": 0,
@@ -427,7 +433,7 @@
     "historico": [],
     "suite": {
       "corre": true,
-      "verde": true
+      "verde": false
     }
   },
   "tablero": {

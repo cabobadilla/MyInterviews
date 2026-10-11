@@ -1,0 +1,1 @@
+import{t as e}from"./styles-Bt0HBIeN.js";var t=e();function n(){return(0,t.jsxs)(`section`,{id:`pipeline`,className:`pantalla`,children:[(0,t.jsx)(`h1`,{children:`Pipeline`}),(0,t.jsx)(`p`,{className:`desc`,children:`Procesos de postulación por estado (datos: T-05).`})]})}export{n as t};
