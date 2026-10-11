@@ -1,18 +1,18 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01 verificada (RED reproducido, sello intacto, mutación muerde). G3: dos corridas rechazadas por RED inválido antes de esta. Fase 5 en curso: quedan T-02 a T-05.",
+  "resumen": "Ciclo 1 · T-01 y T-02 verificadas y la app publicada en Cloudflare. Fase 5 en curso: quedan T-03, T-04 y T-05.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01 verificada",
-  "siguiente": "Despachar T-02 (sesión de un solo usuario) con tests primero.",
+  "fase_actual": "Implementación (G3) — T-01 y T-02 verificadas",
+  "siguiente": "Despachar T-03 (cargar oferta y extraer con LLM). Después T-04 y T-05, y el cierre: smoke, casos ocultos e informe.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
     "G1a": { "evaluado": 1, "rechazo": 0 },
     "G1":  { "evaluado": 2, "rechazo": 1 },
     "G2":  { "evaluado": 1, "rechazo": 0 },
-    "G3":  { "evaluado": 2, "rechazo": 2 },
+    "G3":  { "evaluado": 3, "rechazo": 1 },
     "G4":  { "evaluado": 0, "rechazo": 0 },
     "G5":  { "evaluado": 0, "rechazo": 0 }
   },
@@ -27,6 +27,9 @@
     "plataforma": "Cloudflare Workers",
     "forma_worker": "un solo Worker con `main` (Hono) + `assets` (SPA compilada): un origen, sin CORS (ADR-001)",
     "local": "npx wrangler dev --port 8787 con D1 local, sin cuenta ni credenciales",
+    "url": "https://myinterviews-worker.mkvs.workers.dev",
+    "d1": "myinterviews · cd72c351-2391-4565-9a1f-99a7fbe3f510 · esquema 0001 aplicado en remoto",
+    "secretos": "OPENROUTER_API_KEY · APP_EMAIL · APP_PASSWORD_HASH · PBKDF2_ITERATIONS · SESSION_SECRET (ninguno en el repo: es público)",
     "cloud": "npx wrangler deploy — lo hace solo Hermes. Límite que puede romperlo: CPU por request contra PBKDF2 (login → Error 1102); mitigado con PBKDF2_ITERATIONS como variable"
   },
   "fases": [
@@ -38,7 +41,7 @@
   ],
   "tareas": [
     { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "listo", "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01" },
-    { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "pendiente", "nota": "C-02..C-06" },
+    { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "listo", "nota": "C-02..C-06 · RED reproducido en f08ff33, sello intacto, mutar UMBRAL_FALLOS a 6 pone rojo solo C-04" },
     { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "pendiente", "nota": "C-08..C-13" },
     { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
     { "id": "T-05", "titulo": "Pipeline",                             "estado": "pendiente", "nota": "C-19..C-24" }
