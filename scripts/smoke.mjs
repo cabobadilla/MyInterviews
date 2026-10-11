@@ -114,6 +114,23 @@ async function main() {
     Boolean(id) && (nuevo.json?.aplicacion?.estado === 'borrador' || nuevo.json?.aplicacion?.status === 'borrador'),
     JSON.stringify(nuevo.json)?.slice(0, 200));
 
+  // ── 22-23 · que la extracción NO haya fallado ──────────────────────────────
+  // Van con el número adelante a propósito: se agregaron después, y renumerar 17-21
+  // borraría la correspondencia con las corridas anteriores.
+  //
+  // Por qué existen: un `201` con la extracción **fallida** es el fracaso más engañoso de
+  // todos. La oferta se crea, el status HTTP es el correcto, la postulación queda en
+  // borrador, y el usuario recibe una oferta vacía. Los checks 15 y 16 daban verde con
+  // eso. Pasó de verdad: el Worker no tenía `LLM_MODEL_EXTRACCION` entre sus secretos, así
+  // que la extracción fallaba **solo en producción** mientras en local andaba.
+  const estadoExtraccion = nuevo.json?.oferta?.extraction_status;
+  t('22 · la extracción de una oferta bien formada no falla',
+    estadoExtraccion === 'exitosa' || estadoExtraccion === 'parcial',
+    `extraction_status ${estadoExtraccion}, error: ${nuevo.json?.oferta?.extraction_error}`);
+  t('23 · la extracción devolvió al menos un campo de la oferta',
+    Boolean(nuevo.json?.oferta?.titulo || nuevo.json?.oferta?.empresa),
+    JSON.stringify({ titulo: nuevo.json?.oferta?.titulo, empresa: nuevo.json?.oferta?.empresa }));
+
   const detalle = await req(`/api/offers/${id}`, { cookie: ck });
   t('17 · el detalle de la oferta conserva el texto pegado',
     detalle.status === 200 && String(detalle.json?.oferta?.raw_text || '').includes(marca),
