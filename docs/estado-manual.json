@@ -1,18 +1,18 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01 y T-02 verificadas y la app publicada en Cloudflare. Fase 5 en curso: quedan T-03, T-04 y T-05.",
+  "resumen": "Ciclo 1 · T-01 y T-02 verificadas y publicadas. El smoke contra el edge da 14/21: todo el acceso y la sesión en verde; los 7 rojos son las rutas de T-03, T-04 y T-05, que no existen todavía.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01 y T-02 verificadas",
-  "siguiente": "Despachar T-03 (cargar oferta y extraer con LLM). Después T-04 y T-05, y el cierre: smoke, casos ocultos e informe.",
+  "fase_actual": "Implementación (G3) — T-01 y T-02 verificadas; despachando T-03",
+  "siguiente": "T-03 (cargar oferta y extraer con LLM): pone en verde los checks 14 a 17 del smoke. Después T-04, T-05, y el cierre con casos ocultos e informe.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
     "G1a": { "evaluado": 1, "rechazo": 0 },
     "G1":  { "evaluado": 2, "rechazo": 1 },
     "G2":  { "evaluado": 1, "rechazo": 0 },
-    "G3":  { "evaluado": 3, "rechazo": 1 },
+    "G3":  { "evaluado": 5, "rechazo": 3 },
     "G4":  { "evaluado": 0, "rechazo": 0 },
     "G5":  { "evaluado": 0, "rechazo": 0 }
   },
@@ -28,7 +28,7 @@
     "forma_worker": "un solo Worker con `main` (Hono) + `assets` (SPA compilada): un origen, sin CORS (ADR-001)",
     "local": "npx wrangler dev --port 8787 con D1 local, sin cuenta ni credenciales",
     "url": "https://myinterviews-worker.mkvs.workers.dev",
-    "d1": "myinterviews · cd72c351-2391-4565-9a1f-99a7fbe3f510 · esquema 0001 aplicado en remoto",
+    "d1": "myinterviews · cd72c351-2391-4565-9a1f-99a7fbe3f510 · esquema 0001..0004 aplicado en remoto · el entorno local se alineó a 100.000 iteraciones de PBKDF2 para que el smoke local refleje producción",
     "secretos": "OPENROUTER_API_KEY · APP_EMAIL · APP_PASSWORD_HASH · PBKDF2_ITERATIONS · SESSION_SECRET (ninguno en el repo: es público)",
     "cloud": "npx wrangler deploy — lo hace solo Hermes. Límite que puede romperlo: CPU por request contra PBKDF2 (login → Error 1102); mitigado con PBKDF2_ITERATIONS como variable"
   },
@@ -37,11 +37,11 @@
     { "id": "analisis", "nombre": "2 · Análisis",                 "estado": "completa",  "gate": "G1a", "resumen": "12 dudas resueltas, 3 huecos de esquema encontrados, corte en 3 ciclos fijado por el usuario", "puntos": ["02-ANALISIS.md"] },
     { "id": "def",      "nombre": "3 · Definición",               "estado": "completa",  "gate": "G1",  "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; el resto definido para sus ciclos", "puntos": ["03-DEFINICION.md"] },
     { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "completa",  "gate": "G2",  "resumen": "7 ADRs, matriz C-01..C-24, 5 tareas con contratos, 3 casos ocultos", "puntos": ["04-DISENO.md", "05-TAREAS.md", "ADR-001..007", "contratos/"] },
-    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "en curso",  "gate": "G5",  "resumen": "T-01 verificada. Faltan T-02, T-03, T-04 y T-05.", "puntos": ["tests/", "src/"] }
+    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "en curso",  "gate": "G5",  "resumen": "T-01 y T-02 verificadas; el smoke da 14/21 contra el edge. Faltan T-03, T-04 y T-05.", "puntos": ["tests/", "src/"] }
   ],
   "tareas": [
     { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "listo", "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01" },
-    { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "listo", "nota": "C-02..C-06 · RED reproducido en f08ff33, sello intacto, mutar UMBRAL_FALLOS a 6 pone rojo solo C-04" },
+    { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "listo", "nota": "C-02..C-06 · cuatro defectos que solo el runtime mostraba, todos medidos con wrangler tail o el smoke: /api/session detrás de la barrera, esquema de login_attempts contra el SQL, node:crypto sin nodejs_compat, y el tope de 100.000 de PBKDF2. Más dos que destapó el smoke: el logout no invalidaba (ADR-009) y el cableado llamaba a una función que no importaba (500 en toda ruta protegida). Último: la revocación leía {results} de D1 como si fuera una fila." },
     { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "pendiente", "nota": "C-08..C-13" },
     { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
     { "id": "T-05", "titulo": "Pipeline",                             "estado": "pendiente", "nota": "C-19..C-24" }
@@ -68,7 +68,9 @@
     { "id": "Q2", "texto": "Se agrega `status_previo` a applications: el spec pide «reabrir al estado previo» y el esquema no tenía dónde guardarlo." },
     { "id": "Q3", "texto": "`idx_docs_actual` pasa a índice parcial ÚNICO: con el índice no único podían coexistir dos versiones «vigentes»." },
     { "id": "Q11", "texto": "El CV lo propone un agente (Ciclo 2): el usuario acepta, saca o reordena; nunca decide el agente." },
-    { "id": "Q12", "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)." }
+    { "id": "Q12", "texto": "El brief de entrevista se arma con los datos del entrevistador que entrega el usuario (Ciclo 3)." },
+    { "id": "ADR-008", "texto": "PBKDF2 a 100.000 iteraciones porque es el TECHO de la plataforma: 200.000 da NotSupportedError en el edge y no es CPU ni el plan. El número vive en un secret, no en el código." },
+    { "id": "ADR-009", "texto": "El logout necesita estado: una cookie firmada no deja de valer porque el navegador la olvide. `sesiones_revocadas` guarda el jti de la sesión cerrada y la barrera lo consulta. «Invalidar» pasa a significar que el servidor deja de aceptarla, no que le pide al navegador que la borre." }
   ],
   "siguientes_ciclos": [
     "Ciclo 2 — perfil, importación desde .md y biblioteca de experiencia",
