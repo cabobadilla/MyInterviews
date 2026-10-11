@@ -6,17 +6,18 @@ import { exigirSesion } from './middleware/auth.js';
 import { borrarSesion, leerCookie, serializarSesion } from './lib/cookie.js';
 import { verificar } from './lib/session.js';
 import { VENTANA_SEG } from './lib/rate_limit.js';
+import { esPublica } from './lib/rutas_publicas.js';
 import { respuestaDeLogin, consultarIntentos, registrarIntento } from './routes/auth.js';
 
 const app = new Hono();
 
 app.get('/api/health', (c) => c.json({ ok: true }));
 
-// Barrera de sesión: TODO /api/* salvo POST /api/auth/login y GET /api/session.
+// Barrera de sesión: TODO /api/* salvo lo público (lista única en lib/rutas_publicas.js):
+// POST /api/auth/login y GET /api/session.
 // C-02: sin sesión → 401 sin tocar D1 (el decisor corta antes de cualquier repo).
 app.use('/api/*', async (c, next) => {
-  const ruta = c.req.path;
-  if (ruta === '/api/auth/login' || (ruta === '/api/session' && c.req.method === 'GET')) return next();
+  if (esPublica(c.req.method, c.req.path)) return next();
 
   const cookieHeader = c.req.header('Cookie') ?? null;
   const secreto = c.env?.SESSION_SECRET;
