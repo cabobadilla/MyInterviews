@@ -1,13 +1,19 @@
-✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (304.230542ms)
-✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (366.886375ms)
-✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (389.592125ms)
-✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (380.903917ms)
-✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.344709ms)
-ℹ tests 5
+✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (386.884834ms)
+✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (400.175166ms)
+✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (462.866417ms)
+✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (624.83325ms)
+✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.908834ms)
+✔ C-02 · /api/* sin cookie: el decisor devuelve 401 y no toca ninguna consulta (0.837333ms)
+✔ C-03 · login: email inexistente y contraseña mala dan exactamente el mismo status y el mismo cuerpo (23.860667ms)
+✔ C-04 · límite de intentos: 5 fallos en 15 min y el 6º intento da 429 sin evaluar la contraseña (7.830334ms)
+✔ C-05 · cookie de sesión con HttpOnly, Secure y SameSite=Strict; logout la invalida al borrarla (0.4265ms)
+✔ C-06 · firma inválida o cookie vencida a los 30 días: verificar rechaza y el decisor manda 401 con la cookie borrada (0.424125ms)
+✔ extra · PBKDF2_ITERATIONS leído de env: el mismo hash con otra iteración de env no verifica la contraseña (15.194333ms)
+ℹ tests 11
 ℹ suites 0
-ℹ pass 5
+ℹ pass 11
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 1535.868
+ℹ duration_ms 1974.716541
