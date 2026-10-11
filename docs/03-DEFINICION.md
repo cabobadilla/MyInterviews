@@ -52,6 +52,9 @@ pueda **para** publicar la app en una URL sin exponerla.
 - **C-05** · `comportamiento` · `· C1`
   CUANDO el login es correcto EL SISTEMA DEBE emitir una cookie `HttpOnly; Secure;
   SameSite=Strict`, y `POST /api/auth/logout` DEBE invalidar esa sesión
+  **«Invalidar» significa que el servidor DEJA DE ACEPTARLA**, no que le pide al navegador que
+  la borre: con esa misma cookie, una ruta protegida DEBE responder `401`. Borrar la cookie es
+  el efecto visible, no el criterio — si la cookie se copió, borrarla no la invalida (ADR-009).
 - **C-06** · `comportamiento` · `· C1`
   SI la cookie de sesión tiene firma inválida o venció (>30 días) ENTONCES EL SISTEMA
   DEBE responder `401` y DEBE emitir la cookie borrada
