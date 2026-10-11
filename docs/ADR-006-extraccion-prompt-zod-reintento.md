@@ -10,7 +10,21 @@ El spec §4 fija OpenRouter con modelos económicos configurables por variable. 
 
 ## Decisión
 
-El gateway intenta `response_format` **solo si el modelo declarado lo soporta**; en todos los casos **valida con Zod** y hace **1 reintento incluyendo el error de validación dentro del prompt**. El modelo y la versión del prompt se guardan en la fila.
+El gateway intenta `response_format` **solo si el modelo declarado lo soporta**; en todos los casos
+**valida con un validador propio, sin dependencias**, y hace **1 reintento incluyendo el error de
+validación dentro del prompt**. El modelo y la versión del prompt se guardan en la fila.
+
+**Por qué no Zod, aunque fuera la elección obvia.** No es preferencia: es una consecuencia de
+cómo se verifica. La guardia reproduce el RED clonando el commit de tests en un worktree **sin
+`node_modules`** y corriendo la suite ahí. Un módulo que importa cualquiera de `node_modules` no se
+puede ni cargar en ese árbol, así que **sus casos no se pueden medir**: el test falla por error y la
+corrida se rechaza. Los criterios C-10 y C-11 (qué se considera incompleto, qué se considera JSON
+inválido) son justamente **el corazón de esta tarea**, y son lógica de comparación y forma: no
+necesitan una librería. El validador propio vive en `lib/validar_oferta.js`, importa **nada**, y por
+eso se puede probar de verdad.
+
+La consecuencia buena: una dependencia menos en el Worker, y un validador que dice exactamente qué
+campo falta — que es lo que el usuario ve resaltado en la pantalla.
 
 ## Alternativas descartadas
 
