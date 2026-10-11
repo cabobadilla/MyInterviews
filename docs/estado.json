@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01, T-02, T-03 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 19/23 (los 4 rojos son rutas de T-04 y T-05) y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
+  "resumen": "Ciclo 1 · T-01, T-02, T-03, T-04 y T-06 verificadas y publicadas; falta T-05 (el pipeline). El smoke de HTTP contra el edge da 21/23 —los 2 rojos son las rutas del pipeline (checks 18 y 19), que son T-05— y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01, T-02, T-03 y T-06 verificadas; faltan T-04 y T-05",
-  "siguiente": "T-04 (revisar y editar la oferta: pone en verde los checks 17 y 20) y T-05 (pipeline y contadores: los checks 18 y 19). Después el cierre: casos ocultos contra wrangler dev, informe de QA y la promoción de los chequeos del smoke a criterios numerados.",
+  "fase_actual": "Implementación (G3) — T-01, T-02, T-03, T-04 y T-06 verificadas; falta T-05",
+  "siguiente": "T-05 (el pipeline por estado con los 7 contadores y las 3 mediciones de forma: C-19..C-24). Después el cierre: casos ocultos contra wrangler dev, informe de QA (G5) y la promoción de los chequeos del smoke a criterios numerados.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0": {
@@ -39,8 +39,10 @@
   },
   "casos_ocultos": 3,
   "modelo": {
-    "coder": "opencode-go/glm-5.3-flash",
-    "nota": "canario de capacidad pasado (3/3) antes de despachar"
+    "coder": "opencode-go/deepseek-v4.1-flash",
+    "nota": "cambio de modelo pedido por el usuario (2026-10-11); canario de capacidad pasado (3/3) antes de despachar T-05. El default del harness sigue siendo glm-5.3-flash: ver MODEL-ROUTING.md.",
+    "ultimo_validado": "opencode-go/deepseek-v4.1-flash",
+    "validado_en": "2026-10-11T19:11:50Z"
   },
   "mockup": {
     "url": "https://myinterviews-mockup.mkvs.workers.dev",
@@ -128,8 +130,8 @@
     {
       "id": "T-05",
       "titulo": "Pipeline",
-      "estado": "pendiente",
-      "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma"
+      "estado": "en-curso",
+      "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma. Despachada con opencode-go/deepseek-v4.1-flash."
     },
     {
       "id": "T-06",
@@ -146,8 +148,8 @@
     {
       "id": "T-04",
       "titulo": "Revisar y editar la oferta extraída",
-      "estado": "pendiente",
-      "nota": "C-15..C-17"
+      "estado": "listo",
+      "nota": "C-15..C-17 · RED válido reproducido en c4765b4 (falla por aserción en el commit de tests), sello intacto con 10 archivos, 40/40 en el árbol vivo, y mutar la clase `campo-faltante` → `campo-X` en DetalleOferta.jsx deja 39 pasando y cae SOLO C-16. Actualización de smoke incluida: el cuerpo del PUT (commit d5dada1)."
     }
   ],
   "historias": [
@@ -267,8 +269,8 @@
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-11T16:20:02Z",
-  "commit_sha": "6b4bb44",
+  "generado_en": "2026-10-11T19:54:27Z",
+  "commit_sha": "d5dada1",
   "mecanica": {
     "criterios": [
       {
@@ -358,19 +360,19 @@
       {
         "id": "C-15",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-16",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-17",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
@@ -420,7 +422,7 @@
       "sello": "intacto",
       "red": "verify-red",
       "mutacion": "sin dato",
-      "arbol_limpio": true
+      "arbol_limpio": false
     },
     "costo": {
       "usd": 0,
@@ -435,8 +437,5 @@
       "corre": true,
       "verde": true
     }
-  },
-  "tablero": {
-    "url": "https://myinterviews-tablero.mkvs.workers.dev"
   }
 }

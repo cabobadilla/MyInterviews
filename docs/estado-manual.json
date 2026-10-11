@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01, T-02, T-03 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 19/23 (los 4 rojos son rutas de T-04 y T-05) y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
+  "resumen": "Ciclo 1 · T-01, T-02, T-03, T-04 y T-06 verificadas y publicadas; falta T-05 (el pipeline). El smoke de HTTP contra el edge da 21/23 —los 2 rojos son las rutas del pipeline (checks 18 y 19), que son T-05— y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01, T-02, T-03 y T-06 verificadas; faltan T-04 y T-05",
-  "siguiente": "T-04 (revisar y editar la oferta: pone en verde los checks 17 y 20) y T-05 (pipeline y contadores: los checks 18 y 19). Después el cierre: casos ocultos contra wrangler dev, informe de QA y la promoción de los chequeos del smoke a criterios numerados.",
+  "fase_actual": "Implementación (G3) — T-01, T-02, T-03, T-04 y T-06 verificadas; falta T-05",
+  "siguiente": "T-05 (el pipeline por estado con los 7 contadores y las 3 mediciones de forma: C-19..C-24). Después el cierre: casos ocultos contra wrangler dev, informe de QA (G5) y la promoción de los chequeos del smoke a criterios numerados.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
@@ -17,7 +17,7 @@
     "G5":  { "evaluado": 0, "rechazo": 0 }
   },
   "casos_ocultos": 3,
-  "modelo": { "coder": "opencode-go/glm-5.3-flash", "nota": "canario de capacidad pasado (3/3) antes de despachar" },
+  "modelo": { "coder": "opencode-go/deepseek-v4.1-flash", "nota": "cambio de modelo pedido por el usuario (2026-10-11); canario de capacidad pasado (3/3) antes de despachar T-05. El default del harness sigue siendo glm-5.3-flash: ver MODEL-ROUTING.md.", "ultimo_validado": "opencode-go/deepseek-v4.1-flash", "validado_en": "2026-10-11T19:11:50Z" },
   "mockup": {
     "url": "https://myinterviews-mockup.mkvs.workers.dev",
     "estado": "congelado, con la marca de ciclo (C1/C2/C3) por pantalla",
@@ -43,8 +43,8 @@
     { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "listo", "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01" },
     { "id": "T-02", "titulo": "Sesión de un solo usuario",             "estado": "listo", "nota": "C-02..C-06 · cuatro defectos que solo el runtime mostraba, todos medidos con wrangler tail o el smoke: /api/session detrás de la barrera, esquema de login_attempts contra el SQL, node:crypto sin nodejs_compat, y el tope de 100.000 de PBKDF2. Más dos que destapó el smoke: el logout no invalidaba (ADR-009) y el cableado llamaba a una función que no importaba (500 en toda ruta protegida). Último: la revocación leía {results} de D1 como si fuera una fila." },
     { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "listo", "nota": "C-08..C-13 · el Coder reescribió la rama dejando la implementación ANTES de los tests, así que el RED no se podía reproducir: historia reconstruida por Hermes (su trabajo quedó en la rama coder-t03), RED válido en 37cd0da, sello intacto con 8 archivos, 31/31 en árbol pelado verificado en un clon, y mutar MAX_PROMPT_CARACTERES 15k→20k deja 30 pasando y cae solo C-13. Dos aserciones corregidas con su razón: la de C-12 era imposible de satisfacer (su regex no matcheaba «pegá») y la de C-13 se contradecía con su propio input." },
-    { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
-    { "id": "T-05", "titulo": "Pipeline",                             "estado": "pendiente", "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma" },
+    { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "listo", "nota": "C-15..C-17 · RED válido reproducido en c4765b4 (falla por aserción en el commit de tests), sello intacto con 10 archivos, 40/40 en el árbol vivo, y mutar la clase `campo-faltante` → `campo-X` en DetalleOferta.jsx deja 39 pasando y cae SOLO C-16. Actualización de smoke incluida: el cuerpo del PUT (commit d5dada1)." },
+    { "id": "T-05", "titulo": "Pipeline",                             "estado": "en-curso", "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma. Despachada con opencode-go/deepseek-v4.1-flash." },
     { "id": "T-06", "titulo": "La SPA contra la API (arranque, transición y error)", "estado": "listo", "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. El Coder murió justo antes de commitear (intentó escribir fuera del proyecto): Hermes verificó y commiteó declarando autoría — 36/36 en árbol pelado. Dos correcciones de Hermes: el botón de salida estaba como #salir y el contrato fija #logout-boton (los ids existen para que el caso del fixture y el smoke de navegador miren lo mismo), y los fixtures se reconstruyeron (son artefactos compilados: sin rebuild medían la compilación anterior). RED válido en ac13df5, sello intacto con 9 archivos, y mutar el arranque para forzar login tumba C-01 y C-05. Smoke de interfaz contra el edge: 7/7." }
   ],
   "historias": [
