@@ -5,8 +5,8 @@
 --
 -- SQLite no permite quitar un NOT NULL con ALTER: se crea la tabla nueva
 -- alineada al ADR-007, se copian las filas, se borra la vieja y se renombra.
--- (Este archivo corre antes que 0002_login_attempts_ip_index.sql por orden
--- lexicográfico; ese índice se declara acá y allá queda IF NOT EXISTS.)
+-- El índice se declara acá; 0003 lo repite con IF NOT EXISTS, así que aplicarlo
+-- después es un no-op. La numeración no depende del orden alfabético.
 
 CREATE TABLE login_attempts_nueva (
   ip         TEXT NOT NULL,
