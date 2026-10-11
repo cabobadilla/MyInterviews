@@ -1,25 +1,39 @@
-✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (430.399708ms)
-✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (441.561417ms)
-✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (517.745458ms)
-✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (635.814084ms)
-✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.847666ms)
-✔ C-02b · /api/session es pública: el decisor de rutas la exceptúa (1.481625ms)
-✔ C-04b · el SQL de login_attempts ejecuta contra el esquema de las migraciones (4.910917ms)
-✔ C-02 · /api/session responde 200 {autenticado:false} sin cookie y {autenticado:true} con cookie válida (1.124ms)
-✔ C-02b · el cableado de GET /api/session usa el decisor y nunca devuelve 401 (0.407042ms)
-✔ C-05 · el logout revoca la sesión: con la misma cookie, la barrera responde 401 (8.18975ms)
-✔ C-05 · el SQL de sesiones_revocadas ejecuta contra el esquema de las migraciones (1.045709ms)
-✔ C-02 · /api/* sin cookie: el decisor devuelve 401 y no toca ninguna consulta (1.243083ms)
-✔ C-03 · login: email inexistente y contraseña mala dan exactamente el mismo status y el mismo cuerpo (26.0255ms)
-✔ C-04 · límite de intentos: 5 fallos en 15 min y el 6º intento da 429 sin evaluar la contraseña (8.265541ms)
-✔ C-05 · cookie de sesión con HttpOnly, Secure y SameSite=Strict; logout la invalida al borrarla (0.549167ms)
-✔ C-06 · firma inválida o cookie vencida a los 30 días: verificar rechaza y el decisor manda 401 con la cookie borrada (0.594292ms)
-✔ extra · PBKDF2_ITERATIONS leído de env: el mismo hash con otra iteración de env no verifica la contraseña (15.904208ms)
-ℹ tests 17
+✔ C-01 · login: #login está en el DOM renderizado del fixture login.html (708.579167ms)
+✔ C-07 · nueva-oferta: #nueva-oferta existe en el fixture nueva-oferta.html (392.682375ms)
+✔ C-14 · detalle-oferta: el fixture detalle-oferta.html muestra los campos de la oferta (389.811708ms)
+✔ C-18 · pipeline: #pipeline existe en el fixture pipeline.html (387.035667ms)
+✔ EXTRA · la migración 0001 crea las tablas del Ciclo 1 y las dos correcciones de ADR-003 (0.353417ms)
+✔ C-02b · /api/session es pública: el decisor de rutas la exceptúa (1.242042ms)
+✔ C-04b · el SQL de login_attempts ejecuta contra el esquema de las migraciones (6.306375ms)
+✔ C-02 · /api/session responde 200 {autenticado:false} sin cookie y {autenticado:true} con cookie válida (1.391542ms)
+✔ C-02b · el cableado de GET /api/session usa el decisor y nunca devuelve 401 (0.329833ms)
+✔ C-05 · el logout revoca la sesión: con la misma cookie, la barrera responde 401 (8.795209ms)
+✔ C-05 · el SQL de sesiones_revocadas ejecuta contra el esquema de las migraciones (1.139833ms)
+✔ C-05 · la revocación entiende las DOS formas de respuesta: array (node:sqlite) y {results} (D1) (1.010333ms)
+✔ C-02 · /api/* sin cookie: el decisor devuelve 401 y no toca ninguna consulta (1.778625ms)
+✔ C-03 · login: email inexistente y contraseña mala dan exactamente el mismo status y el mismo cuerpo (24.875042ms)
+✔ C-04 · límite de intentos: 5 fallos en 15 min y el 6º intento da 429 sin evaluar la contraseña (7.993583ms)
+✔ C-05 · cookie de sesión con HttpOnly, Secure y SameSite=Strict; logout la invalida al borrarla (0.6425ms)
+✔ C-06 · firma inválida o cookie vencida a los 30 días: verificar rechaza y el decisor manda 401 con la cookie borrada (0.357625ms)
+✔ extra · PBKDF2_ITERATIONS leído de env: el mismo hash con otra iteración de env no verifica la contraseña (15.812584ms)
+✔ C-08 · guardar el texto crea la oferta y una postulación en borrador (3.233959ms)
+✔ C-09 · pegar una URL descarga server-side y reduce a texto; resultado indistinguible en la UI del camino de texto (1.079209ms)
+✔ C-10 · sin salario ni beneficios → extraction_status parcial con esos campos en campos_faltantes_json (1.101958ms)
+✔ C-11 · JSON inválido tras 1 reintento → fallida, con raw_text y extraction_error, y la oferta se crea igual (0.480709ms)
+✔ C-12 · URL que falla o supera 500 KB → error explícito que offre pegar el texto, sin crear la oferta (0.615417ms)
+✔ C-13 · texto de ~40.000 caracteres: al LLM le llegan ≤15.000 y queda registrado que hubo truncado (0.271416ms)
+✔ EXTRA · gateway: URL canónica, Authorization de la key, y modelo leído de la VARIABLE (nunca constante) (10.671875ms)
+✔ EXTRA · gateway: sin credenciales falla cerrado; el fallo de red repite UNA vez y luego devuelve la falla (0.244875ms)
+✔ EXTRA · gateway: el 503 de la pasarela también gasta su único reintento (0.150833ms)
+✔ EXTRA · gateway: timeout (fetch que nunca contesta) con timeoutMs corto (60.830875ms)
+✔ EXTRA · descargarTexto: descarga fina con cap 500 KB y reporta el motivo del exceso o de la falla (0.578917ms)
+✔ EXTRA · repos de ofertas: la forma REAL de D1 {results, success, meta} y la lista vacía no se confunde (0.264292ms)
+✔ EXTRA · la pantalla «Nueva oferta» tiene selector URL/texto, estado de la extracción y el link de origen (0.367625ms)
+ℹ tests 31
 ℹ suites 0
-ℹ pass 17
+ℹ pass 31
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2140.809833
+ℹ duration_ms 2011.4585
