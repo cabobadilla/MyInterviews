@@ -65,3 +65,35 @@ body{
 .detalle-raw pre{white-space:pre-wrap; max-height:320px; overflow:auto; background:var(--bg, #f7f7f7); padding:8px; border-radius:6px; font-size:13px}
 .detalle-origen a{color:var(--accent, #1f5fd0); word-break:break-all}
 .detalle-error{color:#a12b2b}
+
+/* T-05 — pipeline: contadores, tablero de columnas y próximas entrevistas.
+   Todo con los tokens de :root (sin paleta nueva). */
+.contadores{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:var(--gap)}
+.contador{
+  background:var(--bg); border:1px solid var(--line); border-radius:var(--radius);
+  padding:8px 10px; display:flex; flex-direction:column; gap:2px;
+}
+.contador-numero{font-size:20px; font-weight:700; line-height:1}
+.contador-etiqueta{color:var(--dim); font-size:12px; text-transform:capitalize}
+
+.tablero{display:flex; flex-wrap:nowrap; align-items:stretch; gap:8px; margin-bottom:var(--gap)}
+.columna-estado{
+  flex:1 1 0; min-width:0; display:flex; flex-direction:column;
+  background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:8px;
+}
+.columna-titulo{margin:0 0 8px; font-size:13px; text-transform:capitalize}
+.columna-tarjetas{display:flex; flex-direction:column; gap:6px; min-height:28px}
+.tarjeta-postulacion{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:6px 8px}
+.tarjeta-titulo{margin:0; font-weight:600; font-size:13px}
+.tarjeta-empresa{margin:0; color:var(--dim); font-size:12px}
+
+.proximas{margin-top:var(--gap)}
+.proximas h2{font-size:15px; margin:0 0 8px}
+.proximas-vacio{color:var(--dim); margin:0}
+.lista-entrevistas{list-style:none; margin:0; padding:0}
+.entrevista-fila{
+  display:grid; grid-template-columns:150px 1fr 110px; gap:8px; align-items:center;
+  padding:6px 0; border-bottom:1px solid var(--line);
+}
+.entrevista-fecha{color:var(--dim)}
+.entrevista-tipo{color:var(--dim); text-transform:capitalize}

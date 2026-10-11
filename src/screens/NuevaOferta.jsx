@@ -4,7 +4,24 @@ import { useState } from 'react';
 // y el link de origen. Todo pasa por la API (POST /api/offers/extract): la SPA
 // nunca llama a OpenRouter directamente.
 
-export default function NuevaOferta() {
+// El api es inyectable para que el fixture del pipeline pueda recorrer el alta
+// completa sin red (misma costura que App). Sin api cae al fetch real.
+async function extraerConApi(api, cuerpo) {
+  if (typeof api?.extraerOferta === 'function') {
+    const r = await api.extraerOferta(cuerpo);
+    return { status: r?.status ?? 0, data: r?.data ?? {} };
+  }
+  const resp = await fetch('/api/offers/extract', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(cuerpo),
+  });
+  const data = await resp.json().catch(() => ({}));
+  return { status: resp.status, data };
+}
+
+export default function NuevaOferta({ api } = {}) {
   const [fuente, setFuente] = useState('texto'); // 'texto' | 'url'
   const [url, setUrl] = useState('');
   const [texto, setTexto] = useState('');
@@ -17,17 +34,11 @@ export default function NuevaOferta() {
     setResultado(null);
     try {
       const cuerpo = fuente === 'url' ? { fuente, url: url.trim() } : { fuente, texto };
-      const resp = await fetch('/api/offers/extract', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(cuerpo),
-      });
-      const data = await resp.json().catch(() => ({}));
-      if (resp.status === 201) {
+      const { status, data } = await extraerConApi(api, cuerpo);
+      if (status === 201) {
         setResultado({ ok: true, oferta: data.oferta });
       } else {
-        setResultado({ ok: false, error: data.error ?? `la extracción falló con status ${resp.status}` });
+        setResultado({ ok: false, error: data.error ?? `la extracción falló con status ${status}` });
       }
     } catch {
       setResultado({ ok: false, error: 'no se pudo llamar a la API de extracción' });

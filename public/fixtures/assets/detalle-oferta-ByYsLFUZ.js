@@ -1,0 +1,1 @@
+import{n as e,t}from"./styles-BC4Upu3b.js";import{t as n}from"./DetalleOferta-CSfKRPNT.js";import{t as r}from"./server.browser-Bfsu7U2k.js";var i=r(),a=e(),o=t(),s=document.getElementById(`root`);s&&(s.innerHTML=(0,i.renderToString)((0,o.jsx)(n,{})),(0,a.hydrateRoot)(s,(0,o.jsx)(n,{})));

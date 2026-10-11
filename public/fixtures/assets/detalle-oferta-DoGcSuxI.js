@@ -1,1 +1,0 @@
-import{n as e,t}from"./styles-CCjIumVa.js";import{t as n}from"./DetalleOferta-D9r870L_.js";import{t as r}from"./server.browser-Bw1lmvpK.js";var i=r(),a=e(),o=t(),s=document.getElementById(`root`);s&&(s.innerHTML=(0,i.renderToString)((0,o.jsx)(n,{})),(0,a.hydrateRoot)(s,(0,o.jsx)(n,{})));

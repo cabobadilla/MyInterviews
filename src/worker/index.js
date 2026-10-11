@@ -9,6 +9,7 @@ import { esPublica } from './lib/rutas_publicas.js';
 import { respuestaSesion, respuestaSesionActiva } from './lib/respuesta_sesion.js';
 import { respuestaDeLogin, respuestaDeLogout, consultarIntentos, registrarIntento } from './routes/auth.js';
 import { respuestaDeExtract, respuestaDeListado, respuestaDeDetalle, respuestaDeEdicion } from './routes/offers.js';
+import { respuestaDeAplicaciones, respuestaDeProximasEntrevistas } from './routes/pipeline.js';
 import { estaRevocadoDesdeDb } from './lib/revocacion.js';
 
 const app = new Hono();
@@ -140,6 +141,22 @@ app.put('/api/offers/:id', async (c) => {
     db: c.env?.DB,
     id: c.req.param('id'),
     body,
+    ahoraIso: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  });
+  return c.json(r.body, r.status);
+});
+
+// T-05 — el pipeline: la decisión vive en routes/pipeline.js. GET
+// /api/applications entrega la lista y los 7 contadores (con ceros); GET
+// /api/interviews/proximas entrega las entrevistas futuras por fecha ascendente.
+app.get('/api/applications', async (c) => {
+  const r = await respuestaDeAplicaciones({ db: c.env?.DB });
+  return c.json(r.body, r.status);
+});
+
+app.get('/api/interviews/proximas', async (c) => {
+  const r = await respuestaDeProximasEntrevistas({
+    db: c.env?.DB,
     ahoraIso: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
   });
   return c.json(r.body, r.status);

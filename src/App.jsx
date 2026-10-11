@@ -45,9 +45,11 @@ function extraerErro(r) {
   return r && r.data && typeof r.data.error === 'string' && r.data.error ? r.data.error : MENSAJE_GENERICO;
 }
 
-export default function App({ api = apiReal } = {}) {
+export default function App({ api = apiReal, vistaInicial = 'pendiente' } = {}) {
   // 'pendiente': estadoSesion está en vuelo — ninguna vista decide todavía.
-  const [vista, setVista] = useState('pendiente');
+  // El fixture del pipeline arranca con vistaInicial='pipeline' para medir el
+  // layout sin esperar a la sesión; el arranque real sigue siendo 'pendiente'.
+  const [vista, setVista] = useState(vistaInicial);
   const [errorLogin, setErrorLogin] = useState('');
 
   const decidirPorSesion = async () => {
@@ -111,8 +113,8 @@ export default function App({ api = apiReal } = {}) {
       </aside>
       <div className="contenido">
         {vista === 'login' && <Login onEntrar={entrar} error={errorLogin} />}
-        {vista === 'pipeline' && <Pipeline />}
-        {vista === 'nueva-oferta' && <NuevaOferta />}
+        {vista === 'pipeline' && <Pipeline api={api} />}
+        {vista === 'nueva-oferta' && <NuevaOferta api={api} />}
         {vista === 'detalle-oferta' && <DetalleOferta />}
       </div>
     </>
