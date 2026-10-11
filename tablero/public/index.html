@@ -41,14 +41,14 @@
   <header class="top">
     <div class="sub">Tablero de avance · proceso idea → pruebas</div>
     <h1>MyInterviews</h1>
-    <p class="sub">Ciclo 1 · T-01 verificada (RED reproducido, sello intacto, mutación muerde). G3: dos corridas rechazadas por RED inválido antes de esta. Fase 5 en curso: quedan T-02 a T-05.</p>
+    <p class="sub">Ciclo 1 · T-01 y T-02 verificadas y publicadas. El smoke contra el edge da 14/21: todo el acceso y la sesión en verde; los 7 rojos son las rutas de T-03, T-04 y T-05, que no existen todavía.</p>
     <div class="kpis">
-      <div class="kpi"><b>20%</b><span>Tareas</span></div>
-      <div class="kpi"><b>1/5</b><span>Completadas</span></div>
+      <div class="kpi"><b>40%</b><span>Tareas</span></div>
+      <div class="kpi"><b>2/5</b><span>Completadas</span></div>
       <div class="kpi"><b>Ciclo 1</b><span>Ciclo</span></div>
       <div class="kpi"><b>producto</b><span>Perfil</span></div>
     </div>
-    <p class="frescura" id="frescura">generado_en 2026-10-10T21:28:38Z · commit_sha 4a430bc
+    <p class="frescura" id="frescura">generado_en 2026-10-11T13:02:22Z · commit_sha f730ac5
       · <span id="hace">calculando…</span></p>
   </header>
 
@@ -60,19 +60,19 @@
     <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-02</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-03</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-04</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-05</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-06</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-07</code></td><td>existencia</td>
     <td>✓ cubierto</td>
@@ -132,13 +132,13 @@
 
   <h2>B · Integridad por tarea</h2>
   <div class="caja">
-    <p>Sello: <span class="chip">intacto</span> · RED: verify-red · mutación: sin dato · árbol: sucio</p>
+    <p>Sello: <span class="chip">intacto</span> · RED: verify-red · mutación: sin dato · árbol: limpio</p>
   </div>
   <span class="fuente">fuente: freeze-tests.sh verify · git status --porcelain · docs/06-QA-REPORT.md</span>
 
   <h2>C · Gates</h2>
   <table><thead><tr><th>Gate</th><th class="num">Evaluado</th><th class="num">Rechazó</th><th class="num">Tasa</th></tr></thead>
-  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">2</td><td class="num">2</td><td class="num">100%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
+  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">5</td><td class="num">3</td><td class="num">60%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
   <span class="fuente">fuente: estado.json → gates (lo escribe review.sh)</span>
 
   <h2>D · Costo</h2>
@@ -149,7 +149,7 @@
 
   <h2>E · Lo publicado</h2>
   <div class="caja">
-    <p>Producto: sin URL</p>
+    <p>Producto: <a href="https://myinterviews-worker.mkvs.workers.dev">https://myinterviews-worker.mkvs.workers.dev</a></p>
     <p>Mockup: <a href="https://myinterviews-mockup.mkvs.workers.dev">https://myinterviews-mockup.mkvs.workers.dev</a></p>
   </div>
   <span class="fuente">fuente: estado.json → despliegue (lo escribe deploy.sh) · mockup</span>
@@ -158,7 +158,7 @@
   <ul class="lista"><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-01</span><span class="tk-titulo">Shell: Worker con Hono + SPA que carga</span></li><li class="wait"><span class="tk-estado">○</span>
     <span class="tk-id">T-03</span><span class="tk-titulo">Cargar oferta y extraer con LLM</span></li><li class="wait"><span class="tk-estado">○</span>
-    <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="wait"><span class="tk-estado">○</span>
+    <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-02</span><span class="tk-titulo">Sesión de un solo usuario</span></li><li class="wait"><span class="tk-estado">○</span>
     <span class="tk-id">T-04</span><span class="tk-titulo">Revisar y editar la oferta extraída</span></li></ul>
 
@@ -168,13 +168,13 @@
   <span class="fuente">fuente: docs/corridas/*.json</span>
 
   <footer>
-    <p><strong>Siguiente:</strong> Despachar T-02 (sesión de un solo usuario) con tests primero.</p>
-    <p>actualizado 2026-10-10T21:28:38Z · 4a430bc</p>
+    <p><strong>Siguiente:</strong> T-03 (cargar oferta y extraer con LLM): pone en verde los checks 14 a 17 del smoke. Después T-04, T-05, y el cierre con casos ocultos e informe.</p>
+    <p>actualizado 2026-10-11T13:02:22Z · f730ac5</p>
   </footer>
 </div>
 <script>
   (() => {
-    const gen = "2026-10-10T21:28:38Z";
+    const gen = "2026-10-11T13:02:22Z";
     const el = document.getElementById('hace');
     const caja = document.getElementById('frescura');
     const t = Date.parse(gen);
