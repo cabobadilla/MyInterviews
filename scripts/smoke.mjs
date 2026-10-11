@@ -155,7 +155,10 @@ async function main() {
   // ── 18-21 · el pipeline y el cierre de sesión ──────────────────────────────
   const pipe = await req('/api/applications', { cookie: ck });
   const contadores = pipe.json?.contadores || {};
-  const siete = ['borrador', 'preparando', 'enviada', 'entrevistas', 'cerrada', 'rechazada', 'descartada'];
+  // El vocabulario sale del CHECK del esquema (0001_init.sql), no de un listado a mano:
+  // la lista anterior decía 'descartada' en vez de 'oferta' y quedó tapada mientras la
+  // ruta devolvía 404 — el check 18 fallaba por el 404, no por el vocabulario.
+  const siete = ['borrador', 'preparando', 'enviada', 'entrevistas', 'oferta', 'rechazada', 'cerrada'];
   t('18 · el pipeline trae los 7 contadores por estado',
     pipe.status === 200 && siete.every((e) => e in contadores),
     `status ${pipe.status}, contadores ${JSON.stringify(contadores)}`);

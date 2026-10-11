@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01, T-02, T-03, T-04 y T-06 verificadas y publicadas; falta T-05 (el pipeline). El smoke de HTTP contra el edge da 21/23 —los 2 rojos son las rutas del pipeline (checks 18 y 19), que son T-05— y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
+  "resumen": "Ciclo 1 · T-01, T-02, T-03, T-04, T-05 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 23/23 y el de INTERFAZ 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta. Falta solo el cierre (G5): casos ocultos, informe de QA y la promoción de los chequeos del smoke a criterios numerados.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01, T-02, T-03, T-04 y T-06 verificadas; falta T-05",
-  "siguiente": "T-05 (el pipeline por estado con los 7 contadores y las 3 mediciones de forma: C-19..C-24). Después el cierre: casos ocultos contra wrangler dev, informe de QA (G5) y la promoción de los chequeos del smoke a criterios numerados.",
+  "fase_actual": "Cierre (G5) — las 6 tareas del Ciclo 1 están verificadas y publicadas; falta el cierre formal",
+  "siguiente": "Cierre del Ciclo 1: correr los 3 casos ocultos contra wrangler dev, escribir el informe de QA (06-QA-REPORT.md), promover los chequeos del smoke a criterios numerados, actualizar LEARNINGS.md y commitear.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0": {
@@ -25,7 +25,7 @@
       "rechazo": 0
     },
     "G3": {
-      "evaluado": 5,
+      "evaluado": 6,
       "rechazo": 3
     },
     "G4": {
@@ -130,8 +130,8 @@
     {
       "id": "T-05",
       "titulo": "Pipeline",
-      "estado": "en-curso",
-      "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma. Despachada con opencode-go/deepseek-v4.1-flash."
+      "estado": "listo",
+      "nota": "C-19..C-24 · RED válido en 7ad5be7, sello intacto con 11 archivos, 50/50 en limpio, cobertura 24/24. Mutación: quitar 'cerrada' de ESTADOS tira solo C-19 (2 de 3 tests); bajar --sidebar 240→220 + rebuild tira solo C-23. Hallazgo de QA: el smoke check 18 tenía el vocabulario mal ('descartada' en vez de 'oferta') y quedó tapado por el 404 previo; corregido contra el CHECK del esquema. Smoke HTTP del edge: 23/23 · interfaz: 7/7."
     },
     {
       "id": "T-06",
@@ -269,8 +269,8 @@
     "Ciclo 3 — cierre con aprendizajes y vista global filtrable",
     "Contenido final de las 2 plantillas de CV — el usuario lo definirá (spec §10)"
   ],
-  "generado_en": "2026-10-11T19:54:27Z",
-  "commit_sha": "d5dada1",
+  "generado_en": "2026-10-11T23:03:42Z",
+  "commit_sha": "aa84d12",
   "mecanica": {
     "criterios": [
       {
@@ -384,37 +384,37 @@
       {
         "id": "C-19",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-20",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-21",
         "clase": "comportamiento",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-22",
         "clase": "forma",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-23",
         "clase": "forma",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       },
       {
         "id": "C-24",
         "clase": "—",
-        "cubierto": false,
+        "cubierto": true,
         "oculto": false
       }
     ],

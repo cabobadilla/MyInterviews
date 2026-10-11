@@ -41,14 +41,14 @@
   <header class="top">
     <div class="sub">Tablero de avance · proceso idea → pruebas</div>
     <h1>MyInterviews</h1>
-    <p class="sub">Ciclo 1 · T-01, T-02, T-03, T-04 y T-06 verificadas y publicadas; falta T-05 (el pipeline). El smoke de HTTP contra el edge da 21/23 —los 2 rojos son las rutas del pipeline (checks 18 y 19), que son T-05— y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.</p>
+    <p class="sub">Ciclo 1 · T-01, T-02, T-03, T-04, T-05 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 23/23 y el de INTERFAZ 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta. Falta solo el cierre (G5): casos ocultos, informe de QA y la promoción de los chequeos del smoke a criterios numerados.</p>
     <div class="kpis">
-      <div class="kpi"><b>83%</b><span>Tareas</span></div>
-      <div class="kpi"><b>5/6</b><span>Completadas</span></div>
+      <div class="kpi"><b>100%</b><span>Tareas</span></div>
+      <div class="kpi"><b>6/6</b><span>Completadas</span></div>
       <div class="kpi"><b>Ciclo 1</b><span>Ciclo</span></div>
       <div class="kpi"><b>producto</b><span>Perfil</span></div>
     </div>
-    <p class="frescura" id="frescura">generado_en 2026-10-11T19:54:27Z · commit_sha d5dada1
+    <p class="frescura" id="frescura">generado_en 2026-10-11T23:03:42Z · commit_sha aa84d12
       · <span id="hace">calculando…</span></p>
   </header>
 
@@ -111,22 +111,22 @@
     <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-19</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-20</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-21</code></td><td>comportamiento</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-22</code></td><td>forma</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-23</code></td><td>forma</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr><tr>
     <td><code>C-24</code></td><td>—</td>
-    <td>✗ sin test</td>
+    <td>✓ cubierto</td>
     <td>—</td></tr></tbody></table>
   <span class="fuente">fuente: docs/04-DISENO.md + tests/ (grep)</span>
 
@@ -138,7 +138,7 @@
 
   <h2>C · Gates</h2>
   <table><thead><tr><th>Gate</th><th class="num">Evaluado</th><th class="num">Rechazó</th><th class="num">Tasa</th></tr></thead>
-  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">5</td><td class="num">3</td><td class="num">60%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
+  <tbody><tr><td><code>G0</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G1</code></td><td class="num">2</td><td class="num">1</td><td class="num">50%</td></tr><tr><td><code>G1a</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G2</code></td><td class="num">1</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G3</code></td><td class="num">6</td><td class="num">3</td><td class="num">50%</td></tr><tr><td><code>G4</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr><tr><td><code>G5</code></td><td class="num">0</td><td class="num">0</td><td class="num">0%</td></tr></tbody></table>
   <span class="fuente">fuente: estado.json → gates (lo escribe review.sh)</span>
 
   <h2>D · Costo</h2>
@@ -157,7 +157,7 @@
   <h2>Tareas del ciclo</h2>
   <ul class="lista"><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-01</span><span class="tk-titulo">Shell: Worker con Hono + SPA que carga</span></li><li class="ok"><span class="tk-estado">✓</span>
-    <span class="tk-id">T-03</span><span class="tk-titulo">Cargar oferta y extraer con LLM</span></li><li class="run"><span class="tk-estado">◐</span>
+    <span class="tk-id">T-03</span><span class="tk-titulo">Cargar oferta y extraer con LLM</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-05</span><span class="tk-titulo">Pipeline</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-06</span><span class="tk-titulo">La SPA contra la API (arranque, transición y error)</span></li><li class="ok"><span class="tk-estado">✓</span>
     <span class="tk-id">T-02</span><span class="tk-titulo">Sesión de un solo usuario</span></li><li class="ok"><span class="tk-estado">✓</span>
@@ -169,13 +169,13 @@
   <span class="fuente">fuente: docs/corridas/*.json</span>
 
   <footer>
-    <p><strong>Siguiente:</strong> T-05 (el pipeline por estado con los 7 contadores y las 3 mediciones de forma: C-19..C-24). Después el cierre: casos ocultos contra wrangler dev, informe de QA (G5) y la promoción de los chequeos del smoke a criterios numerados.</p>
-    <p>actualizado 2026-10-11T19:54:27Z · d5dada1</p>
+    <p><strong>Siguiente:</strong> Cierre del Ciclo 1: correr los 3 casos ocultos contra wrangler dev, escribir el informe de QA (06-QA-REPORT.md), promover los chequeos del smoke a criterios numerados, actualizar LEARNINGS.md y commitear.</p>
+    <p>actualizado 2026-10-11T23:03:42Z · aa84d12</p>
   </footer>
 </div>
 <script>
   (() => {
-    const gen = "2026-10-11T19:54:27Z";
+    const gen = "2026-10-11T23:03:42Z";
     const el = document.getElementById('hace');
     const caja = document.getElementById('frescura');
     const t = Date.parse(gen);
