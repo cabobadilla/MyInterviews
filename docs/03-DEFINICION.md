@@ -39,6 +39,10 @@ pueda **para** publicar la app en una URL sin exponerla.
 - **C-02** · `comportamiento` · `· C1` · `[ACC-13]`
   SI se pide cualquier `/api/*` distinto de `POST /api/auth/login` sin sesión válida
   ENTONCES EL SISTEMA DEBE responder `401` y NO DEBE ejecutar ninguna consulta contra D1
+  **EXCEPTO `GET /api/session`, que DEBE responder `200`** — con `{autenticado:true}` si la
+  cookie es válida y `{autenticado:false}` si no lo es—. Es la llamada que la SPA usa para
+  decidir entre login y app: si devolviera `401`, la SPA no podría distinguir «no hay sesión»
+  de «no puedo preguntar», que son cosas distintas.
 - **C-03** · `comportamiento` · `· C1` · `[ACC-13]`
   CUANDO el login falla EL SISTEMA DEBE responder un error **genérico**, sin revelar si
   el email existe ni distinguirlo de una contraseña incorrecta

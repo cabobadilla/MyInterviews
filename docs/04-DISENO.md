@@ -238,6 +238,7 @@ assets. El valor de `APP_PASSWORD_HASH` se genera **fuera** del entorno del Code
 |---|---|---|---|---|
 | **C-01** | Sin sesión se ve el login | C-01 | existencia | `pagina.caja('#login') !== null` en el fixture `login.html` |
 | `C-02` | `/api/*` sin cookie | C-02 | comportamiento | `GET /api/offers` sin cookie → `401`; **0** consultas D1 |
+| `C-02` | `GET /api/session`, la excepción | C-02 | comportamiento | sin cookie → `200 {autenticado:false}`; con cookie válida → `200 {autenticado:true}` |
 | `C-03` | Login falla, error genérico | C-03 | comportamiento | email inexistente y contraseña mala → **mismo status y mismo cuerpo** |
 | `C-04` | 6º intento bloqueado | C-04 | comportamiento | 5 fallos → 6º responde `429` **sin verificar la contraseña** |
 | `C-05` | Cookie de sesión y logout | C-05 | comportamiento | `Set-Cookie` con `HttpOnly`, `Secure`, `SameSite=Strict`; tras logout la cookie vieja → `401` |
