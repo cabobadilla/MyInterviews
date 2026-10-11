@@ -72,8 +72,23 @@ async function main() {
     `status ${sesionAnon.status}, cuerpo ${JSON.stringify(sesionAnon.json)}`);
 
   // ── 9-10 · login ───────────────────────────────────────────────────────────
+  // El límite de intentos (C-04) es por IP y son 5 fallos en 15 minutos. Este smoke manda una
+  // contraseña mala a propósito, así que CADA CORRIDA GASTA UN INTENTO: corriéndolo en bucle se
+  // bloquea la IP propia y todo lo que depende del login falla en cascada, con la apariencia de
+  // una app rota. Cuando eso pasa, esto NO se puede evaluar y hay que decirlo, no contarlo como
+  // 14 defectos.
+  const porLimite = (r) => r.status === 429;
+  const abortarPorLimite = (donde) => {
+    console.log(`\n  ⚠ 429 en ${donde}: la IP está limitada por intentos fallidos — es C-04 funcionando,`);
+    console.log('    no un defecto. La ventana son 15 minutos desde el último fallo.');
+    console.log('    Los chequeos que necesitan sesión NO se evaluaron: este resultado no dice nada de la app.\n');
+    console.log(`  ${ok} ok / ${fail} fail / ${ok + fail} corridos — INCOMPLETO por límite de intentos\n`);
+    process.exit(3);
+  };
+
   const malo = await req('/api/auth/login', { method: 'POST', body: { email: EMAIL || 'x@y.invalid', password: 'mala-a-proposito' } });
   t('9 · login con contraseña mala da 401', malo.status === 401, `status ${malo.status}`);
+  if (porLimite(malo)) abortarPorLimite('el login con contraseña mala');
 
   if (!EMAIL || !PASSWORD) {
     console.log('\n  ⚠ sin MYINTERVIEWS_EMAIL/MYINTERVIEWS_PASSWORD: los chequeos que necesitan sesión se saltan.');
@@ -82,6 +97,7 @@ async function main() {
   }
 
   const bueno = await req('/api/auth/login', { method: 'POST', body: { email: EMAIL, password: PASSWORD } });
+  if (porLimite(bueno)) abortarPorLimite('el login correcto');
   const ck = (bueno.setCookie || '').split(';')[0];
   t('10 · login correcto da 200 con cookie', bueno.status === 200 && ck.includes('='),
     `status ${bueno.status}, set-cookie ${bueno.setCookie.slice(0, 60)}`);
@@ -149,7 +165,10 @@ async function main() {
 
   const editada = await req(`/api/offers/${id}`, {
     method: 'PUT', cookie: ck,
-    body: { extracted_json: { titulo: `Editado ${marca}`, empresa: 'SMOKE SA' } },
+    // Campos PLANOS: el contrato de T-04 fija que el cliente dice qué campos cambia y la
+    // mezcla la hace el servidor. Mandar {extracted_json:{…}} convertía esto en un 400 —
+    // el smoke codificaba una suposición que el contrato no tenía escrita.
+    body: { titulo: `Editado ${marca}`, empresa: 'SMOKE SA' },
   });
   t('20 · editar la oferta a mano se guarda', editada.status === 200, `status ${editada.status}`);
 

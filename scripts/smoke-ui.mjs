@@ -73,6 +73,29 @@ const t = (nombre, ok, detalle) => {
   console.log(`  ${ok ? '✓' : '✗'} ${nombre}${ok || !detalle ? '' : ` — ${detalle}`}`);
 };
 
+// Antes de abrir el navegador: ¿la IP está limitada por intentos fallidos (C-04)? Este sondeo
+// usa la contraseña CORRECTA, que no se registra como fallo, así que no gasta intentos. Sin
+// esto, una corrida bloqueada reporta «la app no entra» cuando la app está defendiéndose.
+try {
+  const s = await fetch(`${URL_APP}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: EMAIL, password: CLAVE }),
+  });
+  if (s.status === 429) {
+    console.log(`\n  ⚠ 429: la IP está limitada por intentos fallidos — es C-04 funcionando, no un defecto.`);
+    console.log('    La ventana son 15 minutos. Este resultado no dice nada de la interfaz.\n');
+    process.exit(3);
+  }
+  if (s.status !== 200) {
+    console.log(`\n  ⚠ el sondeo de login devolvió ${s.status}: sin sesión no se puede probar la interfaz.\n`);
+    process.exit(3);
+  }
+} catch (err) {
+  console.error(`\nNo se pudo sondear el login: ${err.message}\n`);
+  process.exit(3);
+}
+
 const navegador = buscarNavegador();
 if (!navegador) { console.error('No encontré Chrome/Chromium. Definí CHROME_BIN.'); process.exit(2); }
 
