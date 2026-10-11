@@ -38,7 +38,15 @@ export async function revocar(db, jti, exp) {
 export async function verificarRevocacion(db, jti) {
   if (!db || !jti) return false;
   const filas = await conParametros(db, SQL_REVOCADO, [jti]).all();
-  return Array.isArray(filas) ? filas.length > 0 : Boolean(filas);
+  // Dos formas de respuesta: node:sqlite devuelve un array de filas; D1
+  // devuelve el envoltorio { results, success, meta }. Revocado solo si hay
+  // al menos una fila en cualquiera de las dos — Boolean({results: []}) es
+  // true y marcaba TODA sesión como revocada.
+  const rowsEn = (respuesta) =>
+    Array.isArray(respuesta) ? respuesta
+      : respuesta && typeof respuesta === 'object' && Array.isArray(respuesta.results) ? respuesta.results
+        : [];
+  return rowsEn(filas).length > 0;
 }
 
 // estaRevocadoDesdeDb(db) → (jti) => Promise<boolean> — la función INJECTADA
