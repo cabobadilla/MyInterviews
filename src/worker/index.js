@@ -2,7 +2,7 @@
 // límite de intentos viven en los módulos puros de lib/, middleware/ y la
 // parte decisora de routes/auth.js. Este archivo no decide nada propio.
 import { Hono } from 'hono';
-import { exigirSesion } from './middleware/auth.js';
+import { exigirSesionActiva } from './middleware/auth.js';
 import { borrarSesion, leerCookie, serializarSesion } from './lib/cookie.js';
 import { VENTANA_SEG } from './lib/rate_limit.js';
 import { esPublica } from './lib/rutas_publicas.js';
