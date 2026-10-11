@@ -1,11 +1,11 @@
 {
   "proyecto": "MyInterviews",
   "perfil": "producto",
-  "resumen": "Ciclo 1 · T-01, T-02 y T-03 verificadas y publicadas: el smoke del edge da 19/23 y la extracción con el modelo real funciona en producción. Probando la app publicada apareció un hueco que la suite no podía ver —el login queda inerte porque nada en la SPA decide la vista—: entra T-06, y el smoke suma un chequeo con navegador contra la URL publicada.",
+  "resumen": "Ciclo 1 · T-01, T-02, T-03 y T-06 verificadas y publicadas. El smoke de HTTP contra el edge da 19/23 (los 4 rojos son rutas de T-04 y T-05) y el smoke de INTERFAZ da 7/7: la app entra, muestra el error cuando la clave está mal, y el logout vuelve al login — medido con un navegador contra la URL publicada, que es lo que el usuario aprieta.",
   "ciclo": "Ciclo 1",
   "etapa": "MVP — cargar oferta + pipeline",
-  "fase_actual": "Implementación (G3) — T-01, T-02 y T-03 verificadas; T-06 en curso",
-  "siguiente": "T-06 en curso (la SPA contra la API: arranque, transición y error) → T-04 y T-05 → cierre con casos ocultos, informe y deploy. Smokes restantes: los checks 17 y 20 son T-04; 18 y 19 son T-05.",
+  "fase_actual": "Implementación (G3) — T-01, T-02, T-03 y T-06 verificadas; faltan T-04 y T-05",
+  "siguiente": "T-04 (revisar y editar la oferta: pone en verde los checks 17 y 20) y T-05 (pipeline y contadores: los checks 18 y 19). Después el cierre: casos ocultos contra wrangler dev, informe de QA y la promoción de los chequeos del smoke a criterios numerados.",
   "nota_de_proceso": "estado.json es la capa viva; lo escribe Hermes, nunca el Coder. La narrativa vive en docs/estado-manual.json; la mitad mecánica la deriva collect-status.mjs.",
   "gates": {
     "G0":  { "evaluado": 1, "rechazo": 0 },
@@ -37,7 +37,7 @@
     { "id": "analisis", "nombre": "2 · Análisis",                 "estado": "completa",  "gate": "G1a", "resumen": "12 dudas resueltas, 3 huecos de esquema encontrados, corte en 3 ciclos fijado por el usuario", "puntos": ["02-ANALISIS.md"] },
     { "id": "def",      "nombre": "3 · Definición",               "estado": "completa",  "gate": "G1",  "resumen": "C-01..C-24 del Ciclo 1 en EARS con clase; el resto definido para sus ciclos", "puntos": ["03-DEFINICION.md"] },
     { "id": "diseno",   "nombre": "4 · Diseño",                   "estado": "completa",  "gate": "G2",  "resumen": "7 ADRs, matriz C-01..C-24, 5 tareas con contratos, 3 casos ocultos", "puntos": ["04-DISENO.md", "05-TAREAS.md", "ADR-001..007", "contratos/"] },
-    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "en curso",  "gate": "G5",  "resumen": "T-01, T-02 y T-03 verificadas; el smoke da 19/23 contra el edge. Faltan T-04, T-05 y T-06.", "puntos": ["tests/", "src/"] }
+    { "id": "impl",     "nombre": "5 · Implementación y pruebas", "estado": "en curso",  "gate": "G5",  "resumen": "T-01, T-02, T-03 y T-06 verificadas; el smoke HTTP da 19/23 y el de interfaz 7/7 contra el edge. Faltan T-04 y T-05.", "puntos": ["tests/", "src/"] }
   ],
   "tareas": [
     { "id": "T-01", "titulo": "Shell: Worker con Hono + SPA que carga", "estado": "listo", "nota": "C-01, C-07, C-14, C-18 · RED reproducido en 99eaad7, sello intacto, mutar #login pone rojo solo C-01" },
@@ -45,7 +45,7 @@
     { "id": "T-03", "titulo": "Cargar oferta y extraer con LLM",       "estado": "listo", "nota": "C-08..C-13 · el Coder reescribió la rama dejando la implementación ANTES de los tests, así que el RED no se podía reproducir: historia reconstruida por Hermes (su trabajo quedó en la rama coder-t03), RED válido en 37cd0da, sello intacto con 8 archivos, 31/31 en árbol pelado verificado en un clon, y mutar MAX_PROMPT_CARACTERES 15k→20k deja 30 pasando y cae solo C-13. Dos aserciones corregidas con su razón: la de C-12 era imposible de satisfacer (su regex no matcheaba «pegá») y la de C-13 se contradecía con su propio input." },
     { "id": "T-04", "titulo": "Revisar y editar la oferta extraída",   "estado": "pendiente", "nota": "C-15..C-17" },
     { "id": "T-05", "titulo": "Pipeline",                             "estado": "pendiente", "nota": "C-19..C-24 · contadores con ceros y 3 mediciones de forma" },
-    { "id": "T-06", "titulo": "La SPA contra la API (arranque, transición y error)", "estado": "en-curso", "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. Incluye la costura para inyectar la API: sin ella la app no se puede montar con un doble y el defecto vuelve a ser invisible." }
+    { "id": "T-06", "titulo": "La SPA contra la API (arranque, transición y error)", "estado": "listo", "nota": "C-01 (reclasificado), C-03, C-05 · el hueco apareció PROBANDO la app publicada, no leyendo código: con C-01 como existencia la suite medía que el formulario existiera en un fixture y nunca que la app eligiera la vista, así que el login podía quedar inerte con todo en verde. El Coder murió justo antes de commitear (intentó escribir fuera del proyecto): Hermes verificó y commiteó declarando autoría — 36/36 en árbol pelado. Dos correcciones de Hermes: el botón de salida estaba como #salir y el contrato fija #logout-boton (los ids existen para que el caso del fixture y el smoke de navegador miren lo mismo), y los fixtures se reconstruyeron (son artefactos compilados: sin rebuild medían la compilación anterior). RED válido en ac13df5, sello intacto con 9 archivos, y mutar el arranque para forzar login tumba C-01 y C-05. Smoke de interfaz contra el edge: 7/7." }
   ],
   "historias": [
     { "id": "HU-1", "titulo": "Acceso de un solo usuario",           "ciclo": "C1", "criterios": 6 },
